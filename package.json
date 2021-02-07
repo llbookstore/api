@@ -1,0 +1,20 @@
+{
+  "name": "llbook-api",
+  "version": "1.0.0",
+  "description": "llbook's api for client-page, admin-page",
+  "main": "index.js",
+  "repository": "https://github.com/llbookstore/api",
+  "author": "LuongLegend <luongprolv99@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
