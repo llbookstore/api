@@ -7,6 +7,8 @@ const { account } = db.initModels(sequelize);
 //bcrypt
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+//jwt
+const jwt = require('jsonwebtoken');
 const normalConfig = require('../config/normal');
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
 const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$')
@@ -18,19 +20,23 @@ module.exports = {
             const { username, fullname, password, email, birth_date, gender, type, created_by, phone } = req.body;
             //check username
             const findAccByUsername = await account.findOne({ where: { account_name: username } });
-            if (findAccByUsername) res.json(returnError('410', `username: ${username} already exists`, {}, path));
+            if (findAccByUsername) return res.json(returnError('410', `Tài khoản ${username} đã được đăng ký`, {}, path));
             //check email    
             if (email) {
                 const findAccByEmail = await account.findOne({ where: { email } });
-                if (findAccByEmail) res.json(returnError('410', `email: ${email} already exists`, {}, path));
+                if (findAccByEmail) return res.json(returnError('410', `email ${email} đã được đăng ký`, {}, path));
             }
-            if (password.length < 6) res.json(returnError('400', `password must gte 6 characters`, {}, path));
+            if (phone) {
+                const findAccByPhone = await account.findOne({ where: { phone } });
+                if (findAccByPhone) return res.json(returnError('410', `số điện thoại ${phone} đã được đăng ký`, {}, path));
+            }
+            if (password.length < 6) return res.json(returnError('400', `password must gte 6 characters`, {}, path));
             let hashedPassword
             try {
                 hashedPassword = await bcrypt.hash(password, saltRounds);
             } catch (err) {
                 console.log(err);
-                res.json(returnError('500', err.message, {}, path));
+                return res.json(returnError('500', err.message, {}, path));
             }
             const created_at = getCurrentTimestamp();
             const data = {
@@ -50,14 +56,14 @@ module.exports = {
                 const item = await account.build(data);
                 await item.validate();
             } catch (err) {
-                res.json(returnError('400', err.message, {}, path));
+                return res.json(returnError('400', err.message, {}, path));
             }
             let result = await account.create(data);
             result.created_at = timestampToDate(created_at,);
-            res.json(returnSuccess(200, 'OK', result, path));
+            return res.json(returnSuccess(200, 'OK', result, path));
         } catch (err) {
             console.log(err);
-            res.json(returnError('500', err.message, {}, path));
+            return res.json(returnError('500', err.message, {}, path));
         }
     },
 
@@ -99,6 +105,8 @@ module.exports = {
             else if (time_end) {
                 condition.created_at = { [Op.lte]: parseInt(time_end) }
             }
+            const bearerHeader = req.headers['authorization'];
+            console.log(bearerHeader)
             //end find by time
             const get_account = await account.findAndCountAll({
                 attributes: { exclude: ['password'] },
@@ -112,10 +120,49 @@ module.exports = {
                 item.dataValues.updated_at = timestampToDate(item.dataValues.updated_at);
                 return item;
             })
-            res.json(returnSuccess(200, 'OK', get_account, path));
+            return res.json(returnSuccess(200, 'OK', get_account, path));
         } catch (err) {
             console.log(err);
-            res.json(returnError('500', err.message, {}, path));
+            return res.json(returnError('500', err.message, {}, path));
+        }
+    },
+
+    async login(req, res, next) {
+        try {
+
+            const path = req.path;
+            //check input
+            const { username = '', password = '' } = req.body;
+            if (!username || !password || username.length < 6 || password.length < 6)
+                return res.json(returnError('401', `invalid input`, {}, path));
+            //check username exist ?
+            const findAccByUsername = await account.findOne({ where: { account_name: username } });
+            if (!findAccByUsername)
+                return res.json(returnError('401', `username: ${username} doesn't exist`, {}, path));
+            //find password
+            const hashedPassword = findAccByUsername.password;
+            //check password.
+            const comparePassword = await bcrypt.compare(password, hashedPassword);
+            if (!comparePassword)
+                return res.json(returnError('401', `password is not match`, {}, path));
+            else {
+                const token = jwt.sign(
+                    {
+                        email: findAccByUsername.email,
+                        userId: findAccByUsername.account_id,
+                        username: findAccByUsername.account_name,
+                        fullname: findAccByUsername.full_name,
+                        type: findAccByUsername.type
+                    },
+                    process.env.JWT_SECRET,
+                    function (err, token) {
+                        if (err) return res.json(returnError('500', err.message, {}, path));
+                        return res.json(returnSuccess(200, 'Authentication successful!', { token }, path));
+                    });
+            }
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError('500', err.message, {}, path));
         }
     }
 }
