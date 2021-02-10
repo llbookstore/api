@@ -105,8 +105,6 @@ module.exports = {
             else if (time_end) {
                 condition.created_at = { [Op.lte]: parseInt(time_end) }
             }
-            const bearerHeader = req.headers['authorization'];
-            console.log(bearerHeader)
             //end find by time
             const get_account = await account.findAndCountAll({
                 attributes: { exclude: ['password'] },
@@ -155,6 +153,7 @@ module.exports = {
                         type: findAccByUsername.type
                     },
                     process.env.JWT_SECRET,
+                    { expiresIn: '1d' },
                     function (err, token) {
                         if (err) return res.json(returnError('500', err.message, {}, path));
                         return res.json(returnSuccess(200, 'Authentication successful!', { token }, path));
