@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
-const { account } = db.initModels(sequelize);
+const { account, favourite } = db.initModels(sequelize);
 //bcrypt
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -119,6 +119,32 @@ module.exports = {
                 return item;
             })
             return res.json(returnSuccess(200, 'OK', get_account, path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError('500', err.message, {}, path));
+        }
+    },
+
+    async getAccountById(req, res, next) {
+        const path = req.path;
+        try {
+            const { id } = req.params;
+            const findAccById = await account.findOne({
+                attributes: { exclude: ['password'] },
+                include: [{
+                    model: favourite,
+                    attributes: ['book_id'],
+                    as: 'favourites'
+                }],
+                where: {
+                    account_id: id, 
+                }
+            });
+            if(findAccById){
+                findAccById.created_at = timestampToDate(findAccById.created_at);
+                findAccById.updated_at = timestampToDate(findAccById.updated_at);
+            }
+            return res.json(returnSuccess(200,'OK',findAccById, path));
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, path));
