@@ -137,14 +137,59 @@ module.exports = {
                     as: 'favourites'
                 }],
                 where: {
-                    account_id: id, 
+                    account_id: id,
                 }
             });
-            if(findAccById){
+            if (findAccById) {
                 findAccById.created_at = timestampToDate(findAccById.created_at);
                 findAccById.updated_at = timestampToDate(findAccById.updated_at);
             }
-            return res.json(returnSuccess(200,'OK',findAccById, path));
+            if (!findAccById)
+                return res.json(returnSuccess(200, 'Can not find this account', findAccById, path));
+            return res.json(returnSuccess(200, 'OK', findAccById, path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError('500', err.message, {}, path));
+        }
+    },
+
+    async updateAccount(req, res, next) {
+        const path = req.path;
+        try {
+            const { id } = req.params;
+            const findAccById = await account.findByPk(id);
+            if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError('500', err.message, {}, path));
+        }
+    },
+
+    async changePassword(req, res, next) {
+        const path = req.path;
+        try {
+            const { id } = req.params;
+            const findAccById = await account.findByPk(id);
+            if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
+
+            const { password } = req.body;
+            if(!password) return res.json(returnError('400', 'invalid input', {}, path));
+            if (password.length < 6) return res.json(returnError('400', 'password must have at least 6 characters', {}, path));
+            let hashedPassword;
+            try {
+                hashedPassword = await bcrypt.hash(password, saltRounds);
+            } catch (err) {
+                console.log(err);
+                return res.json(returnError('500', err.message, {}, path));
+            }
+            const result = account.update(
+                { password: hashedPassword },
+                {
+                    where: {
+                        account_id: id
+                    }
+                });
+            return res.json(returnSuccess(200, 'change password successful!', result, path));
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, path));
