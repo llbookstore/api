@@ -4,7 +4,14 @@ const router = express.Router();
 const accountService = require('../services/account-service');
 
 router
-    .post('/account',auth, accountService.addAccount)
+    .get('/happy-lunar-new-year', (req, res) => {
+        res.json({
+            success: true,
+            err: 'none',
+            msg: 'happy lunar new year------ be strong like a bull'
+        })
+    })
+    .post('/account', auth, accountService.addAccount)
     .get('/account', accountService.getAllAccount)
     .get('/account/:id', accountService.getAccountById)
     .put('/account/:id', auth, accountService.updateAccount)

@@ -7,7 +7,7 @@ module.exports = {
     },
     dateToTimestamp(date, format = 'MM-DD-YYYY') {
         const day = moment(date, format, true);
-        if (!day.isValid()) throw new Error('invalid date [format: MM-DD-YYYY]');
+        if (!day.isValid()) throw new Error(`invalid date [format: ${format}]`);
         return day.unix();
     },
     timestampToDate(timestamp, format = 'MM-DD-YYYY, h:mm:ss a') {

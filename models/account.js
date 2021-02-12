@@ -59,8 +59,8 @@ module.exports = function(sequelize, DataTypes) {
           msg: 'birth_date must be a integer'
         },
         len: {
-          args: [10],
-          msg: '[birth_date] min: 10 digits'
+          args: [7],
+          msg: '[birth_date] min: 7 digits'
         }
       }
     },

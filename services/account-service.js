@@ -11,13 +11,14 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 const normalConfig = require('../config/normal');
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
-const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$')
+const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
+const timeRegex2 = new RegExp('^[0-9]{2}/[0-9]{2}/[0-9]{4}$') //DD/MM/YYYY
 module.exports = {
 
     async addAccount(req, res, next) {
         const path = req.path;
         try {
-            const { username, fullname, password, email, birth_date, gender, type, created_by, phone } = req.body;
+            let { username, fullname, password, email, birth_date, gender, type, created_by, phone } = req.body;
             //check username
             const findAccByUsername = await account.findOne({ where: { account_name: username } });
             if (findAccByUsername) return res.json(returnError('410', `Tài khoản ${username} đã được đăng ký`, {}, path));
@@ -29,6 +30,10 @@ module.exports = {
             if (phone) {
                 const findAccByPhone = await account.findOne({ where: { phone } });
                 if (findAccByPhone) return res.json(returnError('410', `số điện thoại ${phone} đã được đăng ký`, {}, path));
+            }
+            if(birth_date && !timeRegex2.test(birth_date)) return res.json(returnError('400','invalid birth-date',{},path));
+            else {
+                birth_date = dateToTimestamp(birth_date, 'DD/MM/YYYY');
             }
             if (password.length < 6) return res.json(returnError('400', `password must gte 6 characters`, {}, path));
             let hashedPassword
@@ -59,6 +64,9 @@ module.exports = {
                 return res.json(returnError('400', err.message, {}, path));
             }
             let result = await account.create(data);
+            if(result.birth_date) {
+                result.birth_date = timestampToDate(result.birth_date, 'DD-MM-YYYY');
+            }
             result.created_at = timestampToDate(created_at,);
             return res.json(returnSuccess(200, 'OK', result, path));
         } catch (err) {
@@ -116,6 +124,7 @@ module.exports = {
             get_account.rows.map(item => {
                 item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
                 item.dataValues.updated_at = timestampToDate(item.dataValues.updated_at);
+                item.dataValues.birth_date = timestampToDate(item.dataValues.birth_date);
                 return item;
             })
             return res.json(returnSuccess(200, 'OK', get_account, path));
@@ -159,6 +168,8 @@ module.exports = {
             const { id } = req.params;
             const findAccById = await account.findByPk(id);
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
+
+//            const { phone, email, }
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, path));
@@ -173,7 +184,7 @@ module.exports = {
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
 
             const { password } = req.body;
-            if(!password) return res.json(returnError('400', 'invalid input', {}, path));
+            if (!password) return res.json(returnError('400', 'invalid input', {}, path));
             if (password.length < 6) return res.json(returnError('400', 'password must have at least 6 characters', {}, path));
             let hashedPassword;
             try {
