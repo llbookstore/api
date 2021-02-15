@@ -18,7 +18,7 @@ module.exports = {
     async addAccount(req, res, next) {
         const path = req.path;
         try {
-            let { username, fullname, password, email, birth_date, gender, type, created_by, phone } = req.body;
+            let { username, fullname, password, email, birth_date, gender, type, phone } = req.body;
             //check username
             const findAccByUsername = await account.findOne({ where: { account_name: username } });
             if (findAccByUsername) return res.json(returnError('410', `Tài khoản ${username} đã được đăng ký`, {}, path));
@@ -31,8 +31,8 @@ module.exports = {
                 const findAccByPhone = await account.findOne({ where: { phone } });
                 if (findAccByPhone) return res.json(returnError('410', `số điện thoại ${phone} đã được đăng ký`, {}, path));
             }
-            if(birth_date && !timeRegex2.test(birth_date)) return res.json(returnError('400','invalid birth-date',{},path));
-            else {
+            if (birth_date && !timeRegex2.test(birth_date)) return res.json(returnError('400', 'invalid birth-date', {}, path));
+            if (birth_date) {
                 birth_date = dateToTimestamp(birth_date, 'DD/MM/YYYY');
             }
             if (password.length < 6) return res.json(returnError('400', `password must gte 6 characters`, {}, path));
@@ -44,6 +44,7 @@ module.exports = {
                 return res.json(returnError('500', err.message, {}, path));
             }
             const created_at = getCurrentTimestamp();
+            const created_by = req.userData.username;
             const data = {
                 account_name: username,
                 full_name: fullname,
@@ -64,7 +65,7 @@ module.exports = {
                 return res.json(returnError('400', err.message, {}, path));
             }
             let result = await account.create(data);
-            if(result.birth_date) {
+            if (result.birth_date) {
                 result.birth_date = timestampToDate(result.birth_date, 'DD-MM-YYYY');
             }
             result.created_at = timestampToDate(created_at,);
@@ -152,6 +153,7 @@ module.exports = {
             if (findAccById) {
                 findAccById.created_at = timestampToDate(findAccById.created_at);
                 findAccById.updated_at = timestampToDate(findAccById.updated_at);
+                findAccById.birth_date = timestampToDate(findAccById.birth_date);
             }
             if (!findAccById)
                 return res.json(returnSuccess(200, 'Can not find this account', findAccById, path));
@@ -163,13 +165,50 @@ module.exports = {
     },
 
     async updateAccount(req, res, next) {
+        const { username } = req.userData;
         const path = req.path;
         try {
             const { id } = req.params;
             const findAccById = await account.findByPk(id);
+            let { account_name, password, avatar } = findAccById;
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
-
-//            const { phone, email, }
+            const { phone, email, fullname, birth_date, gender, type, active } = req.body;
+            //check update 
+            if (birth_date) {
+                if (!timeRegex2.test(birth_date)) return res.json(returnError('400', 'invalid birth-date', {}, path));
+                else
+                    birth_date = dateToTimestamp(birth_date, 'DD/MM/YYYY');
+            }
+            const updated_at = getCurrentTimestamp();
+            const updated_by = username;
+            const data = { account_name, password, phone, email, full_name: fullname, birth_date, gender, type, active };
+            //validation
+            try {
+                const item = await account.build(data);
+                await item.validate();
+            } catch (err) {
+                return res.json(returnError('400', err.message, {}, path));
+            }
+            if (req.file) avatar = req.file.filename;
+            const result = account.update(
+                {
+                    phone,
+                    email,
+                    full_name: fullname,
+                    birth_date,
+                    gender,
+                    type,
+                    active,
+                    updated_at,
+                    avatar,
+                    updated_by
+                },
+                {
+                    where: {
+                        account_id: id
+                    }
+                });
+            return res.json(returnSuccess(200, 'updated', result, path))
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, path));
@@ -186,6 +225,8 @@ module.exports = {
             const { password } = req.body;
             if (!password) return res.json(returnError('400', 'invalid input', {}, path));
             if (password.length < 6) return res.json(returnError('400', 'password must have at least 6 characters', {}, path));
+            const updated_at = getCurrentTimestamp();
+            const updated_by = req.userData.username;
             let hashedPassword;
             try {
                 hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -193,8 +234,9 @@ module.exports = {
                 console.log(err);
                 return res.json(returnError('500', err.message, {}, path));
             }
+
             const result = account.update(
-                { password: hashedPassword },
+                { password: hashedPassword, updated_at, updated_by },
                 {
                     where: {
                         account_id: id

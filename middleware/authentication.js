@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 module.exports = (req, res, next) => {
     try {
         const bearerHeader = req.headers['authorization'];
-        if (!bearerHeader) return res.status(403).json('you need token to do this api');
+        if (!bearerHeader) return res.status(403).json({ msg: 'you need token to do this api' });
         //Authorization: bearer token
         else {
             const bearerToken = bearerHeader.split(' ')[1];//get token
@@ -13,6 +13,6 @@ module.exports = (req, res, next) => {
         }
     } catch (err) {
         console.log(err);
-        return res.status(401).json({'msg': 'Invalid or expired token provided!'});
+        return res.status(401).json({ 'msg': 'Invalid or expired token provided!' });
     }
 }

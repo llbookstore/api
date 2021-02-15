@@ -23,13 +23,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     full_name: {
       type: DataTypes.STRING(255),
-      allowNull: true,
-      validate: {
-        checkFullname(fn) {
-          if (fn.trim() == 0)
-            throw new Error('fullname must have at least one character!');
-        }
-      }
+      allowNull: true
     },
     password: {
       type: DataTypes.STRING(255),
@@ -88,7 +82,7 @@ module.exports = function(sequelize, DataTypes) {
           msg: 'type must be a number'
         },
         checkStatus(status) {
-          if (status < 0 || status > 1)
+          if (status < 0)
 
             throw new Error('type is invalid!');
         }
