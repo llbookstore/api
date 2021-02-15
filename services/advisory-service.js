@@ -1,5 +1,5 @@
 
-const {Op} = require('sequelize');
+const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
@@ -10,7 +10,7 @@ const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateTo
 const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
 
 module.exports = {
-    async getAdvisory(req, res, next){
+    async getAdvisory(req, res, next) {
         try {
             let { q = '', time_start, time_end, status, current_page, row_per_page } = req.query;
             const limit = parseInt(row_per_page) || normalConfig.row_per_page;
@@ -22,7 +22,7 @@ module.exports = {
             const condition = {
                 [Op.or]: [
                     { username: { [Op.substring]: q } },
-                    { phone: { [Op.substring]: q } }, 
+                    { phone: { [Op.substring]: q } },
                 ]
             };
 
@@ -57,10 +57,37 @@ module.exports = {
                 return item;
             })
 
-            return res.json(returnSuccess(200,'OK',get_advisory,req.path));
+            return res.json(returnSuccess(200, 'OK', get_advisory, req.path));
         } catch (err) {
             console.log(err);
-            return res.json(returnError(500,err.message, {}, req.path));
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    },
+
+    async requestAdvisory(req, res, next) {
+        const path = req.path;
+        try {
+            const { username, phone, user_note, address } = req.body;
+            if(!username || !phone || !user_note) return res.json(returnError(500,'invalid input',{}, path));
+            const status = 0;
+            const advisoryData = { username, phone, user_note, status, address };
+            try {
+                const item = await advisory.build(advisoryData);
+                const validatedItem = await item.validate();
+            } catch (err) {
+                console.log(err);
+                return res.json(returnError('500', err.message, {}, path));
+            }
+
+            advisoryData.created_at = getCurrentTimestamp();
+            const advisory_new = await advisory.create(advisoryData);
+            return res.json(returnSuccess(200, 'request a advisory', advisory_new, path))
+
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError('500', err.message, {}, path));
+
         }
     }
+
 }

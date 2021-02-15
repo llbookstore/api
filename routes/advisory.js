@@ -5,5 +5,5 @@ const advisoryService = require('../services/advisory-service');
 
 router
     .get('/advisory', advisoryService.getAdvisory)
-
+    .post('/advisory', advisoryService.requestAdvisory)
 module.exports = router
