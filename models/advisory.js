@@ -17,7 +17,13 @@ module.exports = function(sequelize, DataTypes) {
     },
     phone: {
       type: DataTypes.STRING(15),
-      allowNull: true
+      allowNull: true,
+      validate: {
+        is: {
+          args: /^[0]{1}[1235789]{1}[0-9]{8}$/i,
+          msg: 'invalid phone number'
+        }
+      }
     },
     user_note: {
       type: DataTypes.STRING(255),
@@ -31,7 +37,17 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TINYINT,
       allowNull: true,
       defaultValue: 1,
-      comment: "0 - cancel\n1 - pending\n2 - approved"
+      comment: "0 - cancel\n1 - pending\n2 - approved",
+      validate: {
+        isInt: {
+          msg: 'status must be a number'
+        },
+        checkStatus(status) {
+          if (status < 0)
+
+            throw new Error('status is invalid!');
+        }
+      }
     },
     handle_history: {
       type: DataTypes.TEXT,
