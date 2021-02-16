@@ -68,7 +68,7 @@ module.exports = {
         const path = req.path;
         try {
             const { username, phone, user_note, address } = req.body;
-            if(!username || !phone || !user_note) return res.json(returnError(500,'invalid input',{}, path));
+            if (!username || !phone || !user_note) return res.json(returnError(500, 'invalid input', {}, path));
             const status = 0;
             const advisoryData = { username, phone, user_note, status, address };
             try {
@@ -88,6 +88,40 @@ module.exports = {
             return res.json(returnError('500', err.message, {}, path));
 
         }
-    }
+    },
 
+    async responseAdvisory(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { status, note } = req.body;
+            if(!status || !note) {
+                return res.json(returnError(500,'invalid input', {}, req.path));
+            }
+            const { userId, username } = req.userData;
+            const findAdvisoryWithId = await advisory.findOne({ where: { advisory_id: id } });
+            if (!findAdvisoryWithId) {
+                return res.json(returnError(500, 'can not find this advisory', {}, req.path));
+            }
+
+            let { handle_history } = findAdvisoryWithId;
+            if (handle_history[0] !== '[') handle_history = '[]'; 
+            const handle_at = getCurrentTimestamp();
+            const adminHanlde = {
+                admin_id: userId,
+                admin: username,
+                note,
+                status,
+                handle_at
+            }
+            const newHandleHistory = handle_history ? [...JSON.parse(handle_history), adminHanlde] : [adminHanlde];
+            const updateAdvisory = { status, handle_history: JSON.stringify(newHandleHistory) };
+
+            const resAdvisory = await advisory.update(updateAdvisory, { where: { advisory_id: id } });
+            return res.json(returnSuccess(200,'ok', resAdvisory, req.path));
+
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    }
 }
