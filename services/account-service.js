@@ -123,9 +123,12 @@ module.exports = {
                 order: [['account_id', 'ASC']],
             });
             get_account.rows.map(item => {
-                item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
-                item.dataValues.updated_at = timestampToDate(item.dataValues.updated_at);
-                item.dataValues.birth_date = timestampToDate(item.dataValues.birth_date);
+                if (item.dataValues.created_at)
+                    item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
+                if (item.dataValues.updated_at)
+                    item.dataValues.updated_at = timestampToDate(item.dataValues.updated_at);
+                if (item.dataValues.birth_date)
+                    item.dataValues.birth_date = timestampToDate(item.dataValues.birth_date);
                 return item;
             })
             return res.json(returnSuccess(200, 'OK', get_account, path));
@@ -151,9 +154,12 @@ module.exports = {
                 }
             });
             if (findAccById) {
-                findAccById.created_at = timestampToDate(findAccById.created_at);
-                findAccById.updated_at = timestampToDate(findAccById.updated_at);
-                findAccById.birth_date = timestampToDate(findAccById.birth_date);
+                if (findAccById.created_at)
+                    findAccById.created_at = timestampToDate(findAccById.created_at);
+                if (findAccById.updated_at)
+                    findAccById.updated_at = timestampToDate(findAccById.updated_at);
+                if (findAccById.birth_date)
+                    findAccById.birth_date = timestampToDate(findAccById.birth_date);
             }
             if (!findAccById)
                 return res.json(returnSuccess(200, 'Can not find this account', findAccById, path));

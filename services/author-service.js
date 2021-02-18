@@ -49,8 +49,10 @@ module.exports = {
                 order: [['author_id', 'DESC']],
             });
             getAllAuthors.rows.map(item => {
-                item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
-                item.dataValues.updated_at = timestampToDate(item.dataValues.updated_at);
+                if (item.dataValues.created_at)
+                    item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
+                if (item.dataValues.updated_at)
+                    item.dataValues.updated_at = timestampToDate(item.dataValues.updated_at);
                 return item;
             })
 
@@ -70,8 +72,10 @@ module.exports = {
                 }
             });
             if (findAuthorById) {
-                findAuthorById.created_at = timestampToDate(findAuthorById.created_at);
-                findAuthorById.updated_at = timestampToDate(findAuthorById.updated_at);
+                if (findAuthorById.created_at)
+                    findAuthorById.created_at = timestampToDate(findAuthorById.created_at);
+                if (findAuthorById.updated_at)
+                    findAuthorById.updated_at = timestampToDate(findAuthorById.updated_at);
             }
             if (!findAuthorById)
                 return res.json(returnSuccess(200, 'Can not find this author', findAuthorById, path));
@@ -106,9 +110,9 @@ module.exports = {
                     author_id: id,
                 }
             });
-            if(!findAuthorById) return res.json(returnError(404,'can not find the author', {}, req.path));
+            if (!findAuthorById) return res.json(returnError(404, 'can not find the author', {}, req.path));
             let { name, avatar, description } = req.body;
-            
+
             if (name && name.length < 4) return res.json(returnError(400, 'invalid input', {}, req.path));
             if (req.file) avatar = req.file.filename;
             const updated_at = getCurrentTimestamp();

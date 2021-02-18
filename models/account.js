@@ -123,11 +123,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       validate: {
         isInt: {
-          msg: 'created_at must be a number (0-1)'
+          msg: 'created_at must be a number'
         },
         len: {
-          args: [10],
-          msg: '[created_at] min: 10 digits'
+          args: [7],
+          msg: '[created_at] min: 7 digits'
         }
       }
     },
@@ -140,11 +140,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       validate: {
         isInt: {
-          msg: 'updated_at must be a number (0-1)'
+          msg: 'updated_at must be a number'
         },
         len: {
-          args: [10],
-          msg: '[updated_at] min: 10 digits'
+          args: [7],
+          msg: '[updated_at] min: 7 digits'
         }
       }
     },

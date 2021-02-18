@@ -53,7 +53,8 @@ module.exports = {
                 order: [['advisory_id', 'DESC']],
             });
             get_advisory.rows.map(item => {
-                item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
+                if (item.dataValues.created_at)
+                    item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
                 return item;
             })
 
@@ -94,8 +95,8 @@ module.exports = {
         try {
             const { id } = req.params;
             const { status, note } = req.body;
-            if(!status || !note) {
-                return res.json(returnError(500,'invalid input', {}, req.path));
+            if (!status || !note) {
+                return res.json(returnError(500, 'invalid input', {}, req.path));
             }
             const { userId, username } = req.userData;
             const findAdvisoryWithId = await advisory.findOne({ where: { advisory_id: id } });
@@ -104,7 +105,7 @@ module.exports = {
             }
 
             let { handle_history } = findAdvisoryWithId;
-            if (handle_history[0] !== '[') handle_history = '[]'; 
+            if (handle_history[0] !== '[') handle_history = '[]';
             const handle_at = getCurrentTimestamp();
             const adminHanlde = {
                 admin_id: userId,
@@ -117,7 +118,7 @@ module.exports = {
             const updateAdvisory = { status, handle_history: JSON.stringify(newHandleHistory) };
 
             const resAdvisory = await advisory.update(updateAdvisory, { where: { advisory_id: id } });
-            return res.json(returnSuccess(200,'ok', resAdvisory, req.path));
+            return res.json(returnSuccess(200, 'ok', resAdvisory, req.path));
 
         } catch (err) {
             console.log(err);
