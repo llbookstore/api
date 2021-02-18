@@ -6,7 +6,6 @@ const db = require('../models/init-models');
 const { category } = db.initModels(sequelize);
 //config
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
-const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
 
 module.exports = {
     async getCategories(req, res, next) {

@@ -6,9 +6,6 @@ const db = require('../models/init-models');
 const { sale } = db.initModels(sequelize);
 
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
-const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
-const timeRegex2 = new RegExp('^[0-9]{2}\/[0-9]{2}\/[0-9]{4}\s[0-9]{2}\:[0-9]{2}\:[0-9]{2}$'); //DD/MM/YYYY hh:mm:ss
-
 module.exports = {
     async addSale(req, res, next) {
         try {
