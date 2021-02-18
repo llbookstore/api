@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
-const { category } = db.initModels(sequelize);
+const { category, category_detail, book } = db.initModels(sequelize);
 //config
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
 
@@ -23,6 +23,36 @@ module.exports = {
             return res.json(returnError('500', err.message, {}, req.path));
         }
     },
+
+    async getCategoryById(req, res, next) {
+        try {
+            const { id } = req.params;
+            if (!isNumeric(id)) return res.json(returnError(404, 'invalid id', {}, req.path));
+            const findCatById = await category.findOne({
+                include: [
+                    {
+                        model: category_detail,
+                        as: 'category_details',
+                        include: [{
+                            model: book,
+                            as: 'book'
+                        }
+                        ]
+                    }
+                ],
+                where: {
+                    category_id: id
+                }
+            });
+            if (!findCatById) return res.json(returnError(404, `can't find this category`, {}, req.path));
+
+            return res.json(returnSuccess(200, 'OK', findCatById, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError('500', err.message, {}, req.path));
+        }
+    },
+
     async addCategory(req, res, next) {
         try {
             const { name = '', quantity = 0, group_id = -1 } = req.body;

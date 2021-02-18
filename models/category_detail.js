@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('catagory_detail', {
-    catagory_id: {
+  return sequelize.define('category_detail', {
+    category_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
@@ -25,7 +25,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'catagory_detail',
+    tableName: 'category_detail',
     timestamps: false,
     indexes: [
       {

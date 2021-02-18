@@ -5,7 +5,7 @@ const _author = require("./author");
 const _bill = require("./bill");
 const _bill_detail = require("./bill_detail");
 const _book = require("./book");
-const _catagory_detail = require("./catagory_detail");
+const _category_detail = require("./category_detail");
 const _category = require("./category");
 const _comment = require("./comment");
 const _favourite = require("./favourite");
@@ -19,7 +19,7 @@ function initModels(sequelize) {
   const bill = _bill(sequelize, DataTypes);
   const bill_detail = _bill_detail(sequelize, DataTypes);
   const book = _book(sequelize, DataTypes);
-  const catagory_detail = _catagory_detail(sequelize, DataTypes);
+  const category_detail = _category_detail(sequelize, DataTypes);
   const category = _category(sequelize, DataTypes);
   const comment = _comment(sequelize, DataTypes);
   const favourite = _favourite(sequelize, DataTypes);
@@ -28,8 +28,8 @@ function initModels(sequelize) {
 
   bill.belongsToMany(book, { through: bill_detail, foreignKey: "bill_id", otherKey: "book_id" });
   book.belongsToMany(bill, { through: bill_detail, foreignKey: "book_id", otherKey: "bill_id" });
-  category.belongsToMany(book, { through: catagory_detail, foreignKey: "catagory_id", otherKey: "book_id" });
-  book.belongsToMany(category, { through: catagory_detail, foreignKey: "book_id", otherKey: "catagory_id" });
+  category.belongsToMany(book, { through: category_detail, foreignKey: "category_id", otherKey: "book_id" });
+  book.belongsToMany(category, { through: category_detail, foreignKey: "book_id", otherKey: "category_id" });
   account.belongsToMany(book, { through: favourite, foreignKey: "acc_id", otherKey: "book_id" });
   book.belongsToMany(account, { through: favourite, foreignKey: "book_id", otherKey: "acc_id" });
   bill.belongsTo(account, { as: "admin", foreignKey: "admin_id"});
@@ -42,10 +42,10 @@ function initModels(sequelize) {
   author.hasMany(book, { as: "books", foreignKey: "author_id"});
   book.belongsTo(sale, { as: "sale", foreignKey: "sale_id"});
   sale.hasMany(book, { as: "books", foreignKey: "sale_id"});
-  catagory_detail.belongsTo(category, { as: "catagory", foreignKey: "catagory_id"});
-  category.hasMany(catagory_detail, { as: "catagory_details", foreignKey: "catagory_id"});
-  catagory_detail.belongsTo(book, { as: "book", foreignKey: "book_id"});
-  book.hasMany(catagory_detail, { as: "catagory_details", foreignKey: "book_id"});
+  category_detail.belongsTo(category, { as: "category", foreignKey: "category_id"});
+  category.hasMany(category_detail, { as: "category_details", foreignKey: "category_id"});
+  category_detail.belongsTo(book, { as: "book", foreignKey: "book_id"});
+  book.hasMany(category_detail, { as: "category_details", foreignKey: "book_id"});
   comment.belongsTo(account, { as: "acc", foreignKey: "acc_id"});
   account.hasMany(comment, { as: "comments", foreignKey: "acc_id"});
   comment.belongsTo(book, { as: "book", foreignKey: "book_id"});
@@ -62,7 +62,7 @@ function initModels(sequelize) {
     bill,
     bill_detail,
     book,
-    catagory_detail,
+    category_detail,
     category,
     comment,
     favourite,
