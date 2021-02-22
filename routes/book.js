@@ -5,10 +5,10 @@ const bookService = require('../services/book-service');
 const { upload, errHandling } = require('../middleware/upload');
 
 router
-    .post('/book', auth,upload.single('cover'), errHandling, bookService.addBook)
-    .get('/book', bookService.getBooks)
+    .post('/book', auth,upload.single('cover_image'), errHandling, bookService.addBook)
+    .get('/books', bookService.getBooks)
     .get('/book/:id', bookService.getBookById)
-    .put('/book',auth, upload.single('cover'), errHandling, bookService.updateBook)
+    .put('/book/:id',auth, upload.single('cover_image'), errHandling, bookService.updateBook)
     
 
 module.exports = router

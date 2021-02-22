@@ -17,7 +17,13 @@ module.exports = function(sequelize, DataTypes) {
     },
     name: {
       type: DataTypes.STRING(500),
-      allowNull: true
+      allowNull: false,
+      validate: {
+        checkNameLength(name) {
+          if(name.length < 2)
+            throw new Error('name must have more than 2 characters!')
+        }
+      }
     },
     cover_image: {
       type: DataTypes.STRING(255),
@@ -33,7 +39,15 @@ module.exports = function(sequelize, DataTypes) {
     },
     pages: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false,
+      validate: {
+        isInt: {
+          msg: 'pages must be a integer'
+        },
+        checkPositive(item){
+          if(item <0) throw new Error('pages must is Positive Integer')
+        }
+      }
     },
     dimension: {
       type: DataTypes.STRING(45),
@@ -42,7 +56,15 @@ module.exports = function(sequelize, DataTypes) {
     weight: {
       type: DataTypes.DOUBLE,
       allowNull: true,
-      comment: "kg"
+      comment: "kg",
+      validate: {
+        isInt: {
+          msg: 'weight must be a number'
+        },
+        checkPositive(item){
+          if(item <0) throw new Error('weight must is Positive Integer')
+        }
+      }
     },
     published_date: {
       type: DataTypes.INTEGER,
@@ -67,11 +89,27 @@ module.exports = function(sequelize, DataTypes) {
     },
     quantity: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: true,
+      validate: {
+        isInt: {
+          msg: 'quantity must be a number'
+        },
+        checkPositive(item){
+          if(item <0) throw new Error('quantity must is Positive Integer')
+        }
+      }
     },
     price: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      allowNull: false,
+      validate: {
+        isInt: {
+          msg: 'price must be a number'
+        },
+        checkPositive(item){
+          if(item <0) throw new Error('quantity must is Positive Integer')
+        }
+      }
     },
     had_bought: {
       type: DataTypes.INTEGER,
@@ -88,7 +126,16 @@ module.exports = function(sequelize, DataTypes) {
     status: {
       type: DataTypes.TINYINT,
       allowNull: true,
-      comment: "0 - sắp có\n1 - không bán\n2 - dừng sản xuất\n"
+      comment: "0 - sắp có\n1 - không bán\n2 - dừng sản xuất\n",
+      validate: {
+        isInt: {
+          msg: 'status must be a number'
+        },
+        checkPositive(item){
+          if(item <0) throw new Error('status must is Positive Integer')
+        }
+      }
+    
     },
     updated_at: {
       type: DataTypes.INTEGER,
@@ -105,7 +152,12 @@ module.exports = function(sequelize, DataTypes) {
     created_by: {
       type: DataTypes.STRING(45),
       allowNull: true
-    }
+    },
+    active: {
+      type: DataTypes.TINYINT,
+      allowNull: true,
+      defaultValue: 1,
+    },
   }, {
     sequelize,
     tableName: 'book',
