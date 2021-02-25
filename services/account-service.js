@@ -19,6 +19,7 @@ module.exports = {
         const path = req.path;
         try {
             let { username, fullname, password, email, birth_date, gender, type, phone } = req.body;
+            if (!username || !password || !email || !phone) return res.json(returnError('400', 'invalid input', {}, path));
             //check username
             const findAccByUsername = await account.findOne({ where: { account_name: username } });
             if (findAccByUsername) return res.json(returnError('410', `Tài khoản ${username} đã được đăng ký`, {}, path));
@@ -36,6 +37,7 @@ module.exports = {
                 birth_date = dateToTimestamp(birth_date, 'DD/MM/YYYY');
             }
             if (password.length < 6) return res.json(returnError('400', `password must gte 6 characters`, {}, path));
+            if (password.length > 50) return res.json(returnError('400', `password must lte 50 characters`, {}, path));
             let hashedPassword
             try {
                 hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -44,7 +46,8 @@ module.exports = {
                 return res.json(returnError('500', err.message, {}, path));
             }
             const created_at = getCurrentTimestamp();
-            const created_by = req.userData.username;
+            const created_by = req.userData ? req.userData.username : null;
+      
             const data = {
                 account_name: username,
                 full_name: fullname,

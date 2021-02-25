@@ -4,7 +4,7 @@ const router = express.Router();
 const accountService = require('../services/account-service');
 const { upload, errHandling } = require('../middleware/upload');
 router
-    .post('/account', auth, accountService.addAccount)
+    .post('/account', accountService.addAccount)
     .get('/account', accountService.getAllAccount)
     .get('/account/:id', accountService.getAccountById)
     .put('/account/:id', auth, upload.single('avatar'), errHandling, accountService.updateAccount)

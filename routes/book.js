@@ -10,5 +10,4 @@ router
     .get('/book/:id', bookService.getBookById)
     .put('/book/:id',auth, upload.single('cover_image'), errHandling, bookService.updateBook)
     
-
 module.exports = router
