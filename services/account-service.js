@@ -181,7 +181,7 @@ module.exports = {
             const findAccById = await account.findByPk(id);
             let { account_name, password, avatar } = findAccById;
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
-            const { phone, email, fullname, birth_date, gender, type, active } = req.body;
+            let { phone, email, fullname, birth_date, gender, type, active } = req.body;
             //check update 
             if (birth_date) {
                 if (!timeRegex2.test(birth_date)) return res.json(returnError('400', 'invalid birth-date', {}, path));
