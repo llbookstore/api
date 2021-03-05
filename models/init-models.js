@@ -1,30 +1,32 @@
-const DataTypes = require("sequelize").DataTypes;
-const _account = require("./account");
-const _advisory = require("./advisory");
-const _author = require("./author");
-const _bill = require("./bill");
-const _bill_detail = require("./bill_detail");
-const _book = require("./book");
-const _category_detail = require("./category_detail");
-const _category = require("./category");
-const _comment = require("./comment");
-const _favourite = require("./favourite");
-const _news = require("./news");
-const _sale = require("./sale");
+var DataTypes = require("sequelize").DataTypes;
+var _account = require("./account");
+var _advisory = require("./advisory");
+var _author = require("./author");
+var _bill = require("./bill");
+var _bill_detail = require("./bill_detail");
+var _book = require("./book");
+var _category = require("./category");
+var _category_detail = require("./category_detail");
+var _comment = require("./comment");
+var _favourite = require("./favourite");
+var _news = require("./news");
+var _publishing_house = require("./publishing_house");
+var _sale = require("./sale");
 
 function initModels(sequelize) {
-  const account = _account(sequelize, DataTypes);
-  const advisory = _advisory(sequelize, DataTypes);
-  const author = _author(sequelize, DataTypes);
-  const bill = _bill(sequelize, DataTypes);
-  const bill_detail = _bill_detail(sequelize, DataTypes);
-  const book = _book(sequelize, DataTypes);
-  const category_detail = _category_detail(sequelize, DataTypes);
-  const category = _category(sequelize, DataTypes);
-  const comment = _comment(sequelize, DataTypes);
-  const favourite = _favourite(sequelize, DataTypes);
-  const news = _news(sequelize, DataTypes);
-  const sale = _sale(sequelize, DataTypes);
+  var account = _account(sequelize, DataTypes);
+  var advisory = _advisory(sequelize, DataTypes);
+  var author = _author(sequelize, DataTypes);
+  var bill = _bill(sequelize, DataTypes);
+  var bill_detail = _bill_detail(sequelize, DataTypes);
+  var book = _book(sequelize, DataTypes);
+  var category = _category(sequelize, DataTypes);
+  var category_detail = _category_detail(sequelize, DataTypes);
+  var comment = _comment(sequelize, DataTypes);
+  var favourite = _favourite(sequelize, DataTypes);
+  var news = _news(sequelize, DataTypes);
+  var publishing_house = _publishing_house(sequelize, DataTypes);
+  var sale = _sale(sequelize, DataTypes);
 
   bill.belongsToMany(book, { through: bill_detail, foreignKey: "bill_id", otherKey: "book_id" });
   book.belongsToMany(bill, { through: bill_detail, foreignKey: "book_id", otherKey: "bill_id" });
@@ -40,6 +42,8 @@ function initModels(sequelize) {
   book.hasMany(bill_detail, { as: "bill_details", foreignKey: "book_id"});
   book.belongsTo(author, { as: "author", foreignKey: "author_id"});
   author.hasMany(book, { as: "books", foreignKey: "author_id"});
+  book.belongsTo(publishing_house, { as: "publishing", foreignKey: "publishing_id"});
+  publishing_house.hasMany(book, { as: "books", foreignKey: "publishing_id"});
   book.belongsTo(sale, { as: "sale", foreignKey: "sale_id"});
   sale.hasMany(book, { as: "books", foreignKey: "sale_id"});
   category_detail.belongsTo(category, { as: "category", foreignKey: "category_id"});
@@ -62,11 +66,12 @@ function initModels(sequelize) {
     bill,
     bill_detail,
     book,
-    category_detail,
     category,
+    category_detail,
     comment,
     favourite,
     news,
+    publishing_house,
     sale,
   };
 }

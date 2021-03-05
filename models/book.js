@@ -70,10 +70,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: true
     },
-    publishing_house: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
     publisher: {
       type: DataTypes.STRING(255),
       allowNull: true
@@ -158,6 +154,14 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: 1,
     },
+  publishing_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'publishing_house',
+        key: 'publishing_id'
+      }
+    }
   }, {
     sequelize,
     tableName: 'book',
@@ -191,6 +195,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "sale_id" },
+        ]
+      },
+{
+        name: "book_fk_publishing_idx",
+        using: "BTREE",
+        fields: [
+          { name: "publishing_id" },
         ]
       },
     ]

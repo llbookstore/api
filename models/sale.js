@@ -10,7 +10,7 @@ module.exports = function(sequelize, DataTypes) {
     active: {
       type: DataTypes.TINYINT,
       allowNull: true,
-      default: 1,
+      defaultValue: 1,
       comment: "0 - inactive\\\\\\\\n1 - active"
     },
     percent: {
