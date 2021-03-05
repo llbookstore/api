@@ -8,9 +8,13 @@ const { category, category_detail, book } = db.initModels(sequelize);
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
 
 module.exports = {
+
     async getCategories(req, res, next) {
         try {
-            const result = await category.findAll({});
+            const { active } = req.query;
+            const condition = {};
+            if (active) condition.active = active;
+            const result = await category.findAll({where: condition});
             result.map(item => {
                 if (item.dataValues.created_at)
                     item.dataValues.created_at = timestampToDate(item.dataValues.created_at);

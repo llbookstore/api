@@ -57,6 +57,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(45),
       allowNull: true
     },
+    active: {
+      type: DataTypes.TINYINT,
+      defaultValue: 1
+    }
   }, {
     sequelize,
     tableName: 'category',
