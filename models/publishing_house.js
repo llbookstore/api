@@ -2,9 +2,9 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('publishing_house', {
     publishing_id: {
+      autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 1,
       primaryKey: true
     },
     name: {
@@ -16,8 +16,46 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     description: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.TEXT,
       allowNull: true
+    },
+    created_at: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        isInt: {
+          msg: 'created_at must be a number'
+        },
+        len: {
+          args: [7],
+          msg: '[created_at] min: 7 digits'
+        }
+      }
+    },
+    created_by: {
+      type: DataTypes.STRING(45),
+      allowNull: true
+    },
+    updated_at: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        isInt: {
+          msg: 'updated_at must be a number'
+        },
+        len: {
+          args: [7],
+          msg: '[updated_at] min: 7 digits'
+        }
+      }
+    },
+    updated_by: {
+      type: DataTypes.STRING(45),
+      allowNull: true
+    },
+    active: {
+      type: DataTypes.TINYINT,
+      defaultValue: 1
     }
   }, {
     sequelize,

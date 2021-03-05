@@ -14,7 +14,7 @@ module.exports = {
             const { active } = req.query;
             const condition = {};
             if (active) condition.active = active;
-            const result = await category.findAll({where: condition});
+            const result = await category.findAll({ where: condition });
             result.map(item => {
                 if (item.dataValues.created_at)
                     item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
@@ -71,12 +71,13 @@ module.exports = {
             return res.json(returnError('500', err.message, {}, req.path));
         }
     },
+
     async updateCategory(req, res, next) {
         try {
             const { id } = req.params;
             const findCatById = await category.findByPk(id);
             if (!findCatById) return res.json(returnError(404, `can't find the category`, {}, req.path));
-            const { name, quantity, group_id } = req.body;
+            const { name, quantity, group_id, active } = req.body;
             if ((group_id && !isNumeric(group_id))
                 || (quantity && !isNumeric(quantity))
                 || (name && name.length < 4)
@@ -85,6 +86,7 @@ module.exports = {
             const updated_at = getCurrentTimestamp();
             const updated_by = req.userData.username;
             const data = { name, quantity, group_id, updated_at, updated_by };
+            if (active === '1' || active === '0') data.active = active;
             await category.update(
                 data,
                 {
@@ -98,4 +100,20 @@ module.exports = {
             return res.json(returnError('500', err.message, {}, req.path));
         }
     },
+
+    async deleteCategory(req, res, next) {
+        try {
+            const { id } = req.params;
+            const findCatById = await category.findByPk(id);
+            if (!findCatById) return res.json(returnError(404, `can't find the category`, {}, req.path));
+            const updated_at = getCurrentTimestamp();
+            const updated_by = req.userData.username;
+            const data = { updated_at, updated_by, active: 0 }
+            await category.update(data, { where: { category_id: id } });
+            return res.json(returnSuccess(200, 'deleted category successfully!', {}, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError('500', err.message, {}, req.path));
+        }
+    }
 }

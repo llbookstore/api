@@ -7,5 +7,6 @@ router
     .get('/category', categoryService.getCategories)
     .get('/category/:id', categoryService.getCategoryById)
     .put('/category/:id', auth,categoryService.updateCategory)
+    .delete('/category/:id', auth, categoryService.deleteCategory)
 
 module.exports = router
