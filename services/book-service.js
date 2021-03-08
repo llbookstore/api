@@ -13,7 +13,17 @@ module.exports = {
 
     async getBooks(req, res, next) {
         try {
-            const { q = '', price_lte, price_gte, row_per_page, current_page, active, status } = req.query;
+            const {
+                q = '',
+                publishing_id,
+                author_id,
+                price_lte,
+                price_gte,
+                row_per_page,
+                current_page,
+                active,
+                status
+            } = req.query;
             //q - query -> name, author-name, publish_house,
             const limit = parseInt(row_per_page) || normalConfig.row_per_page;
             let offset = 0;
@@ -36,24 +46,37 @@ module.exports = {
                 condition.active = active;
             if (status && status >= 0)
                 condition.status = status;
-
+            //
+            if(publishing_id) condition['$publishing.publishing_id$'] = publishing_id;
+            if(author_id) condition['$author.author_id$'] = author_id;
             const findBook = await book.findAndCountAll({
                 where: condition,
                 limit: limit,
                 offset: offset,
-                include: [{
-                    model: author,
-                    as: 'author'
-                },
-                {
-                    model: sale,
-                    as: 'sale'
-                },
-                {
-                    model: publishing_house,
-                    as: 'publishing'
-                }]
+                include: [
+                    {
+                        model: author,
+                        as: 'author',
+                        required: true,
+                    },
+                    {
+                        model: sale,
+                        as: 'sale',
+                        required: true,
+                    },
+                    {
+                        model: publishing_house,
+                        as: 'publishing',
+                        required: true,
+                    },
+                    {
+                        model: category_detail,
+                        as: 'category_details',
+                        attributes: ['category_id'],
+                        // required: true,
+                    }]
             });
+
             return res.json(returnSuccess(200, 'OK', findBook, req.path));
         } catch (err) {
             console.log(err);
@@ -69,6 +92,17 @@ module.exports = {
                 include: [{
                     model: author,
                     as: 'author'
+                },
+                {
+                    model: publishing_house,
+                    as: 'publishing',
+                    required: true,
+                },
+                {
+                    model: category_detail,
+                    as: 'category_details',
+                    attributes: ['category_id'],
+                    required: true,
                 },
                 {
                     model: sale,
