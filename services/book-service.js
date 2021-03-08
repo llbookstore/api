@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
-const { book, author, sale } = db.initModels(sequelize);
+const { book, author, sale, publishing_house, category_detail } = db.initModels(sequelize);
 //config
 const normalConfig = require('../config/normal');
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
@@ -23,7 +23,7 @@ module.exports = {
             const condition = {
                 [Op.or]: [
                     { name: { [Op.substring]: q } },
-                    { publishing_house: { [Op.substring]: q } },
+                    { '$publishing.name$': { [Op.substring]: q } },
                     { description: { [Op.substring]: q } },
                     { '$author.name$': { [Op.substring]: q } },
                 ]
@@ -48,6 +48,10 @@ module.exports = {
                 {
                     model: sale,
                     as: 'sale'
+                },
+                {
+                    model: publishing_house,
+                    as: 'publishing'
                 }]
             });
             return res.json(returnSuccess(200, 'OK', findBook, req.path));
@@ -81,7 +85,24 @@ module.exports = {
 
     async addBook(req, res, next) {
         try {
-            const { name, author_id, description, pages, dimension, weight, published_date, publishing_house, format, book_translator, quantity, price, sale_id, status } = req.body;
+            const {
+                name,
+                author_id,
+                description,
+                pages,
+                dimension,
+                weight,
+                publisher,
+                published_date,
+                publishing_id,
+                format,
+                book_translator,
+                quantity,
+                price,
+                sale_id,
+                status,
+                language
+            } = req.body;
             let cover_image;
             if (req.file) cover_image = req.file.filename;
             const created_at = getCurrentTimestamp();
@@ -93,14 +114,15 @@ module.exports = {
                 pages,
                 dimension,
                 weight,
-                publishing_house,
                 format,
                 book_translator,
                 quantity,
                 price,
                 status,
                 created_at,
-                created_by
+                created_by,
+                language,
+                publisher
             };
             if (!!author_id) {
                 const findAuthor = await author.findByPk(author_id);
@@ -111,6 +133,11 @@ module.exports = {
                 const findSale = await sale.findByPk(sale_id);
                 if (!findSale) return res.json(returnError(404, `sale_id doesn't exist`, {}, req.path));
                 data.sale_id = sale_id;
+            }
+            if (!!publishing_id) {
+                const findPub = await publishing_house.findByPk(publishing_id);
+                if (!findPub) return res.json(returnError(404, `publishing_id doesn't exist`, {}, req.path));
+                data.publishing_id = publishing_id;
             }
             if (published_date) {
                 if (!timeRegex.test(published_date))
@@ -123,8 +150,9 @@ module.exports = {
             } catch (err) {
                 return res.json(returnError(500, err.message, {}, req.path));
             }
-            await book.create(data);
-            return res.json(returnSuccess(200, 'add a book successful!', data, req.path))
+            const creBook = await book.create(data);
+            console.log(creBook.book_id);
+            return res.json(returnSuccess(200, 'add a book successful!', creBook, req.path))
         } catch (err) {
             console.log(err);
             return res.json(returnError(500, err.message, {}, req.path));
@@ -144,14 +172,16 @@ module.exports = {
                 dimension,
                 weight,
                 published_date,
-                publishing_house,
                 format,
                 book_translator,
                 quantity,
                 price = findBookById.price,
                 sale_id,
                 active,
-                status
+                status,
+                publishing_id,
+                publisher,
+                language
             } = req.body;
             let cover_image;
             if (req.file) cover_image = req.file.filename;
@@ -164,7 +194,6 @@ module.exports = {
                 pages,
                 dimension,
                 weight,
-                publishing_house,
                 format,
                 book_translator,
                 quantity,
@@ -172,7 +201,9 @@ module.exports = {
                 status,
                 active,
                 updated_at,
-                updated_by
+                updated_by,
+                publisher,
+                language
             };
             if (!!author_id) {
                 const findAuthor = await author.findByPk(author_id);
@@ -183,6 +214,11 @@ module.exports = {
                 const findSale = await sale.findByPk(sale_id);
                 if (!findSale) return res.json(returnError(404, `sale_id doesn't exist`, {}, req.path));
                 data.sale_id = sale_id;
+            }
+            if (!!publishing_id) {
+                const findPub = await publishing_house.findByPk(publishing_id);
+                if (!findPub) return res.json(returnError(404, `publishing_id doesn't exist`, {}, req.path));
+                data.publishing_id = publishing_id;
             }
             if (published_date) {
                 if (!timeRegex.test(published_date))

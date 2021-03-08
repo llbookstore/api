@@ -11,7 +11,10 @@ const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
 module.exports = {
     async getPublishingHouses(req, res, next) {
         try {
-            const data = await publishing_house.findAll({});
+            const { active } = req.query;
+            const condition = {};
+            if (active === '1' || active === '0') condition.active = active;
+            const data = await publishing_house.findAll({ where: condition });
             return res.json(returnSuccess(200, 'OK', data, req.path));
         } catch (err) {
             console.log(err);
@@ -39,8 +42,8 @@ module.exports = {
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
             const data = { name, description, image, created_at, created_by };
-            await publishing_house.create(data);
-            return res.json(returnSuccess(200, 'created a publishing_house', data, req.path));
+            const crePublishing = await publishing_house.create(data);
+            return res.json(returnSuccess(200, 'created a publishing_house', crePublishing, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError(500, err.message, {}, req.path));

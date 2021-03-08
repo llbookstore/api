@@ -19,11 +19,11 @@ module.exports = {
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
             const data = { percent, date_start, date_end, created_at, created_by };
-            await sale.create(data);
-            data.date_start = timestampToDate(data.date_start);
-            data.date_end = timestampToDate(data.date_end);
-            data.created_at = timestampToDate(data.created_at);
-            return res.json(returnSuccess(200, 'add sale successful!', { data }, req.path));
+            const creSale = await sale.create(data);
+            creSale.date_start = timestampToDate(data.date_start);
+            creSale.date_end = timestampToDate(data.date_end);
+            creSale.created_at = timestampToDate(data.created_at);
+            return res.json(returnSuccess(200, 'add sale successful!', creSale, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));

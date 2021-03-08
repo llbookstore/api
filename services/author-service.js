@@ -94,8 +94,8 @@ module.exports = {
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
             const data = { name, avatar, description, created_at, created_by };
-            await author.create(data);
-            return res.json(returnSuccess(200, 'added a new author', data, req.path));
+            const creAuthor = await author.create(data);
+            return res.json(returnSuccess(200, 'added a new author', creAuthor, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError(500, err.message, {}, req.path));
