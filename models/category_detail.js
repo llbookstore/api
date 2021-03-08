@@ -18,10 +18,6 @@ module.exports = function(sequelize, DataTypes) {
         model: 'book',
         key: 'book_id'
       }
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: true
     }
   }, {
     sequelize,

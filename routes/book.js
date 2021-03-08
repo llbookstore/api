@@ -9,5 +9,6 @@ router
     .get('/books', bookService.getBooks)
     .get('/book/:id', bookService.getBookById)
     .put('/book/:id',auth, upload.single('cover_image'), errHandling, bookService.updateBook)
+    .post('/book/:id/categories', auth, bookService.addBookCategories)
     
 module.exports = router

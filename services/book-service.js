@@ -238,4 +238,27 @@ module.exports = {
             return res.json(returnError(500, err.message, {}, req.path));
         }
     },
+
+    async addBookCategories(req, res, next) {
+        try {
+            const { id } = req.params;
+            const findBookById = await book.findByPk(id);
+            if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
+
+            const { category } = req.body;
+            if (!category) return res.json(returnError(400, 'invalid input', {}, req.path));
+            if (typeof category === 'object' && Array.isArray(category)) {
+                await category_detail.destroy({ where: { book_id: id } });
+                for (let item of category) {
+                    await category_detail.create({ book_id: id, category_id: item });
+                }
+            }
+
+            return res.json(returnSuccess(200, `added book's categories successful!`, {}, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    },
+
 }
