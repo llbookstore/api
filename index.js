@@ -6,8 +6,8 @@ const { PORT = 3333 } = process.env;
 const app = express();
 const { upload, errHandling } = require('./middleware/upload')
 // Allow Cross-Origin requests
-app.use(cors());
-//middleware
+app.use(cors()); //
+//middleware 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -19,6 +19,7 @@ app.post('/upload', upload.single('profile'), errHandling, (req, res) => {
     res.json(req.file)
 });
 //images
-app.use('/images', express.static('images'));
+app.use('/images', express.static('images')); //dung api file anh public
+
 require('./routes/index')(app)
-app.listen(PORT, () => console.log(`app is listening port ${PORT}`));
+app.listen(PORT, () => console.log(`app is listening port ${PORT}`)); //chay server
