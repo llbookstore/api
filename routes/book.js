@@ -10,5 +10,6 @@ router
     .get('/book/:id', bookService.getBookById)
     .put('/book/:id',auth, upload.single('cover_image'), errHandling, bookService.updateBook)
     .post('/book/:id/categories', auth, bookService.addBookCategories)
-    
+    .post('/book/:bookId/favourite', auth, bookService.addFavourite)
+    .delete('/book/:bookId/favourite', auth, bookService.deleteFavourite)
 module.exports = router

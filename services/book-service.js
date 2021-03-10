@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
-const { book, author, sale, publishing_house, category_detail } = db.initModels(sequelize);
+const { book, author, sale, publishing_house, category_detail, favourite } = db.initModels(sequelize);
 //config
 const normalConfig = require('../config/normal');
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
@@ -47,8 +47,8 @@ module.exports = {
             if (status && status >= 0)
                 condition.status = status;
             //
-            if(publishing_id) condition['$publishing.publishing_id$'] = publishing_id;
-            if(author_id) condition['$author.author_id$'] = author_id;
+            if (publishing_id) condition['$publishing.publishing_id$'] = publishing_id;
+            if (author_id) condition['$author.author_id$'] = author_id;
             const findBook = await book.findAndCountAll({
                 where: condition,
                 limit: limit,
@@ -294,5 +294,34 @@ module.exports = {
             return res.json(returnError(500, err.message, {}, req.path));
         }
     },
+
+    async addFavourite(req, res, next) {
+        try {
+            const { bookId } = req.params;
+            const findBookById = book.findByPk(bookId);
+            if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
+            const { userId } = req.userData;
+            const data = {book_id: bookId, acc_id: userId};
+            const createFavourite = await favourite.create(data);
+            return res.json(returnSuccess(200, 'add favourite successful!', createFavourite, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    },
+
+    async deleteFavourite(req, res, next){
+        try {
+            const { bookId } = req.params;
+            const findBookById = book.findByPk(bookId);
+            if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
+            const { userId } = req.userData;
+            await favourite.destroy({where: {book_id: bookId, acc_id: userId}});
+            return res.json(returnSuccess(200, 'delete favourite successful!', {}, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    }
 
 }
