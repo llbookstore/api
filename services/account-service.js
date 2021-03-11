@@ -156,7 +156,7 @@ module.exports = {
                     },
                     {
                         model: cart,
-                        attributes: ['book_id'],
+                        attributes: ['book_id', 'quantity'],
                         as: 'carts',
                     }
                 ],
