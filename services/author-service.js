@@ -105,6 +105,7 @@ module.exports = {
     async updateAuthor(req, res, next) {
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findAuthorById = await author.findOne({
                 where: {
                     author_id: id,

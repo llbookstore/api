@@ -53,6 +53,7 @@ module.exports = {
     async updatePublishingHouse(req, res, next) {
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findPub = await publishing_house.findByPk(id);
             if (!findPub) return res.json(returnError(404, `can't find this publishing_house`, {}, req.path));
             const { name, description, active } = req.body;
@@ -72,6 +73,7 @@ module.exports = {
     async deletePublishingHose(req, res, next) {
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findPub = await publishing_house.findByPk(id);
             if (!findPub) return res.json(returnError(404, `can't find the publishing_house`, {}, req.path));
             const updated_at = getCurrentTimestamp();

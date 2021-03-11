@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
-const { book, author, sale, publishing_house, category_detail, favourite } = db.initModels(sequelize);
+const { book, author, sale, publishing_house, category_detail, favourite, cart } = db.initModels(sequelize);
 //config
 const normalConfig = require('../config/normal');
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
@@ -196,6 +196,7 @@ module.exports = {
     async updateBook(req, res, next) {
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findBookById = await book.findByPk(id);
             if (!findBookById) return res.json(returnError(404, `this book doesn't exist`, {}, req.path));
             const {
@@ -276,6 +277,7 @@ module.exports = {
     async addBookCategories(req, res, next) {
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findBookById = await book.findByPk(id);
             if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
 
@@ -298,10 +300,11 @@ module.exports = {
     async addFavourite(req, res, next) {
         try {
             const { bookId } = req.params;
+            if(!isNumeric(bookId)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findBookById = book.findByPk(bookId);
             if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
             const { userId } = req.userData;
-            const data = {book_id: bookId, acc_id: userId};
+            const data = { book_id: bookId, acc_id: userId };
             const createFavourite = await favourite.create(data);
             return res.json(returnSuccess(200, 'add favourite successful!', createFavourite, req.path));
         } catch (err) {
@@ -310,18 +313,63 @@ module.exports = {
         }
     },
 
-    async deleteFavourite(req, res, next){
+    async removeFavourite(req, res, next) {
         try {
             const { bookId } = req.params;
+            if(!isNumeric(bookId)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findBookById = book.findByPk(bookId);
             if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
             const { userId } = req.userData;
-            await favourite.destroy({where: {book_id: bookId, acc_id: userId}});
+            await favourite.destroy({ where: { book_id: bookId, acc_id: userId } });
             return res.json(returnSuccess(200, 'delete favourite successful!', {}, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError(500, err.message, {}, req.path));
         }
-    }
+    },
+
+    async addCart(req, res, next) {
+        try {
+            const { bookId } = req.params;
+            if(!isNumeric(bookId)) return res.json(returnError(400,'invalid id', {}, req.path));
+            const findBookById = await book.findByPk(bookId);
+            if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
+            console.log(findBookById)
+            const { quantity } = req.body;
+            if (!isNumeric(quantity)) return res.json(returnError(401, 'invalid input', {}, req.path));
+            if(quantity > findBookById.quantity) return res.json(returnError(400,'over book quantity', {}, req.path));
+            const { userId } = req.userData;
+            const findCart = await cart.findOne({ where: { book_id: bookId, acc_id: userId } });
+            let createCart;
+            if (findCart) {
+                createCart = await cart.update({ quantity }, { where: { book_id: bookId, acc_id: userId } })
+            }
+            else {
+                const data = { book_id: bookId, acc_id: userId, quantity };
+                createCart = await cart.create(data);
+            }
+            return res.json(returnSuccess(200, 'add book to cart successful!', createCart, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    },
+
+    async removeCart(req, res, next) {
+        try {
+            const { bookId } = req.params;
+            if(!isNumeric(bookId)) return res.json(returnError(400,'invalid id', {}, req.path));
+            const findBookById = await book.findOne({where: {book_id: bookId}});
+            if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
+            const { userId } = req.userData;
+            const data = { book_id: bookId, acc_id: userId };
+            const rmCart = await cart.destroy({where: data});
+            return res.json(returnSuccess(200, 'remove book to cart successful!', {}, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    },
+
 
 }

@@ -178,6 +178,7 @@ module.exports = {
         const path = req.path;
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findAccById = await account.findByPk(id);
             let { account_name, password, avatar } = findAccById;
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
@@ -228,6 +229,7 @@ module.exports = {
         const path = req.path;
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findAccById = await account.findByPk(id);
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
 

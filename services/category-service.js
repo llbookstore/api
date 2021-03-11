@@ -75,6 +75,7 @@ module.exports = {
     async updateCategory(req, res, next) {
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findCatById = await category.findByPk(id);
             if (!findCatById) return res.json(returnError(404, `can't find the category`, {}, req.path));
             const { name, quantity, group_id, active } = req.body;
@@ -104,6 +105,7 @@ module.exports = {
     async deleteCategory(req, res, next) {
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findCatById = await category.findByPk(id);
             if (!findCatById) return res.json(returnError(404, `can't find the category`, {}, req.path));
             const updated_at = getCurrentTimestamp();

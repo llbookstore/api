@@ -33,6 +33,7 @@ module.exports = {
     async updateSale(req, res, next) {
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             let { percent, date_start, date_end } = req.body;
 
             if (!isNumeric(id)) return res.json(returnError(404, 'invalid id', {}, req.path));
