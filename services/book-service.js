@@ -15,8 +15,8 @@ module.exports = {
         try {
             const {
                 q = '',
-                publishing_id,
-                author_id,
+                // publishing_id,
+                // author_id,
                 price_lte,
                 price_gte,
                 row_per_page,
@@ -33,9 +33,9 @@ module.exports = {
             const condition = {
                 [Op.or]: [
                     { name: { [Op.substring]: q } },
-                    { '$publishing.name$': { [Op.substring]: q } },
+                    // { '$publishing.name$': { [Op.substring]: q } },
                     { description: { [Op.substring]: q } },
-                    { '$author.name$': { [Op.substring]: q } },
+                    // { '$author.name$': { [Op.substring]: q } },
                 ]
             };
             if (price_gte && isNumeric(price_gte))
@@ -47,8 +47,8 @@ module.exports = {
             if (status && status >= 0)
                 condition.status = status;
             //
-            if (publishing_id) condition['$publishing.publishing_id$'] = publishing_id;
-            if (author_id) condition['$author.author_id$'] = author_id;
+            // if (publishing_id) condition['$publishing.publishing_id$'] = publishing_id;
+            // if (author_id) condition['$author.author_id$'] = author_id;
             const findBook = await book.findAndCountAll({
                 where: condition,
                 limit: limit,
@@ -57,23 +57,22 @@ module.exports = {
                     {
                         model: author,
                         as: 'author',
-                        required: true,
+                        // required: true,
                     },
                     {
                         model: sale,
                         as: 'sale',
-                        required: true,
+                        // required: true,
                     },
                     {
                         model: publishing_house,
                         as: 'publishing',
-                        required: true,
+                        // required: true,
                     },
                     {
                         model: category_detail,
                         as: 'category_details',
                         attributes: ['category_id'],
-                        // required: true,
                     }]
             });
 
@@ -96,13 +95,11 @@ module.exports = {
                 {
                     model: publishing_house,
                     as: 'publishing',
-                    required: true,
                 },
                 {
                     model: category_detail,
                     as: 'category_details',
                     attributes: ['category_id'],
-                    required: true,
                 },
                 {
                     model: sale,
@@ -364,7 +361,7 @@ module.exports = {
             const { userId } = req.userData;
             const data = { book_id: bookId, acc_id: userId };
             const rmCart = await cart.destroy({where: data});
-            return res.json(returnSuccess(200, 'remove book to cart successful!', {}, req.path));
+            return res.json(returnSuccess(200, 'remove book to cart successful!', rmCart, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError(500, err.message, {}, req.path));

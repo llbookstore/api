@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
-const { account, favourite } = db.initModels(sequelize);
+const { account, favourite, cart } = db.initModels(sequelize);
 //bcrypt
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -47,7 +47,7 @@ module.exports = {
             }
             const created_at = getCurrentTimestamp();
             const created_by = req.userData ? req.userData.username : null;
-      
+
             const data = {
                 account_name: username,
                 full_name: fullname,
@@ -145,13 +145,21 @@ module.exports = {
         const path = req.path;
         try {
             const { id } = req.params;
+            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findAccById = await account.findOne({
                 attributes: { exclude: ['password'] },
-                include: [{
-                    model: favourite,
-                    attributes: ['book_id'],
-                    as: 'favourites'
-                }],
+                include: [
+                    {
+                        model: favourite,
+                        attributes: ['book_id'],
+                        as: 'favourites',
+                    },
+                    {
+                        model: cart,
+                        attributes: ['book_id'],
+                        as: 'carts',
+                    }
+                ],
                 where: {
                     account_id: id,
                 }
@@ -178,7 +186,7 @@ module.exports = {
         const path = req.path;
         try {
             const { id } = req.params;
-            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findAccById = await account.findByPk(id);
             let { account_name, password, avatar } = findAccById;
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
@@ -229,7 +237,7 @@ module.exports = {
         const path = req.path;
         try {
             const { id } = req.params;
-            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findAccById = await account.findByPk(id);
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
 
