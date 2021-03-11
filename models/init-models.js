@@ -5,6 +5,7 @@ var _author = require("./author");
 var _bill = require("./bill");
 var _bill_detail = require("./bill_detail");
 var _book = require("./book");
+var _cart = require("./cart");
 var _category = require("./category");
 var _category_detail = require("./category_detail");
 var _comment = require("./comment");
@@ -20,6 +21,7 @@ function initModels(sequelize) {
   var bill = _bill(sequelize, DataTypes);
   var bill_detail = _bill_detail(sequelize, DataTypes);
   var book = _book(sequelize, DataTypes);
+  var cart = _cart(sequelize, DataTypes);
   var category = _category(sequelize, DataTypes);
   var category_detail = _category_detail(sequelize, DataTypes);
   var comment = _comment(sequelize, DataTypes);
@@ -30,6 +32,8 @@ function initModels(sequelize) {
 
   bill.belongsToMany(book, { through: bill_detail, foreignKey: "bill_id", otherKey: "book_id" });
   book.belongsToMany(bill, { through: bill_detail, foreignKey: "book_id", otherKey: "bill_id" });
+  account.belongsToMany(book, { through: cart, foreignKey: "acc_id", otherKey: "book_id" });
+  book.belongsToMany(account, { through: cart, foreignKey: "book_id", otherKey: "acc_id" });
   category.belongsToMany(book, { through: category_detail, foreignKey: "category_id", otherKey: "book_id" });
   book.belongsToMany(category, { through: category_detail, foreignKey: "book_id", otherKey: "category_id" });
   account.belongsToMany(book, { through: favourite, foreignKey: "acc_id", otherKey: "book_id" });
@@ -46,6 +50,10 @@ function initModels(sequelize) {
   publishing_house.hasMany(book, { as: "books", foreignKey: "publishing_id"});
   book.belongsTo(sale, { as: "sale", foreignKey: "sale_id"});
   sale.hasMany(book, { as: "books", foreignKey: "sale_id"});
+  cart.belongsTo(account, { as: "acc", foreignKey: "acc_id"});
+  account.hasMany(cart, { as: "carts", foreignKey: "acc_id"});
+  cart.belongsTo(book, { as: "book", foreignKey: "book_id"});
+  book.hasMany(cart, { as: "carts", foreignKey: "book_id"});
   category_detail.belongsTo(category, { as: "category", foreignKey: "category_id"});
   category.hasMany(category_detail, { as: "category_details", foreignKey: "category_id"});
   category_detail.belongsTo(book, { as: "book", foreignKey: "book_id"});
@@ -66,6 +74,7 @@ function initModels(sequelize) {
     bill,
     bill_detail,
     book,
+    cart,
     category,
     category_detail,
     comment,

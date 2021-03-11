@@ -286,7 +286,7 @@ module.exports = {
                         type: findAccByUsername.type
                     },
                     process.env.JWT_SECRET,
-                    { expiresIn: '1d' },
+                    { expiresIn: '7d' },
                     function (err, token) {
                         if (err) return res.json(returnError('500', err.message, {}, path));
                         return res.json(returnSuccess(200, 'Authentication successful!', { token }, path));
