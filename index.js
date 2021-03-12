@@ -6,7 +6,10 @@ const { PORT = 3333 } = process.env;
 const app = express();
 const { upload, errHandling } = require('./middleware/upload')
 // Allow Cross-Origin requests
-app.use(cors()); //
+app.use(cors({
+    origin: '*',
+    maxAge: 86400
+})); //
 //middleware 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

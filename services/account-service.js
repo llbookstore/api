@@ -170,7 +170,7 @@ module.exports = {
                 if (findAccById.updated_at)
                     findAccById.updated_at = timestampToDate(findAccById.updated_at);
                 if (findAccById.birth_date)
-                    findAccById.birth_date = timestampToDate(findAccById.birth_date);
+                    findAccById.birth_date = timestampToDate(findAccById.birth_date, 'DD/MM/YYYY');
             }
             if (!findAccById)
                 return res.json(returnSuccess(200, 'Can not find this account', findAccById, path));
