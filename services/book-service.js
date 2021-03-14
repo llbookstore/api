@@ -331,9 +331,9 @@ module.exports = {
             if(!isNumeric(bookId)) return res.json(returnError(400,'invalid id', {}, req.path));
             const findBookById = await book.findByPk(bookId);
             if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
-            console.log(findBookById)
+
             const { quantity } = req.body;
-            if (!isNumeric(quantity)) return res.json(returnError(401, 'invalid input', {}, req.path));
+            if (Number.isNaN(quantity)) return res.json(returnError(401, 'invalid input', {}, req.path));
             if(quantity > findBookById.quantity) return res.json(returnError(400,'over book quantity', {}, req.path));
             const { userId } = req.userData;
             const findCart = await cart.findOne({ where: { book_id: bookId, acc_id: userId } });
