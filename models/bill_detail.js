@@ -26,18 +26,6 @@ module.exports = function(sequelize, DataTypes) {
     price: {
       type: DataTypes.INTEGER,
       allowNull: true
-    },
-    sale_percent: {
-      type: DataTypes.DOUBLE,
-      allowNull: true
-    },
-    sale_date_end: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    sale_date_start: {
-      type: DataTypes.INTEGER,
-      allowNull: true
     }
   }, {
     sequelize,

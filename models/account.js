@@ -99,7 +99,7 @@ module.exports = function(sequelize, DataTypes) {
         },
         checkStatus(status) {
           if (status < 0 || status > 1)
-            throw new Error('gender is invalid!');
+            throw new Error('active is invalid!');
         }
       }
     },

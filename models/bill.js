@@ -13,7 +13,13 @@ module.exports = function(sequelize, DataTypes) {
     },
     phone: {
       type: DataTypes.STRING(15),
-      allowNull: true
+      allowNull: true,
+      validate: {
+        is: {
+          args: /^[0]{1}[1235789]{1}[0-9]{8}$/i,
+          msg: 'invalid phone number'
+        }
+      }
     },
     address: {
       type: DataTypes.STRING(500),
@@ -41,7 +47,16 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TINYINT,
       allowNull: true,
       defaultValue: 0,
-      comment: "0 - pending\n1 - approved\n2 - cancel"
+      comment: "0 - pending\n1 - approved\n2 - cancel",
+      validate: {
+        isInt: {
+          msg: 'status must be a number (0-2)'
+        },
+        checkStatus(status) {
+          if (status < 0 || status > 2)
+            throw new Error('status is invalid!');
+        }
+      }
     },
     admin_id: {
       type: DataTypes.INTEGER,
@@ -58,7 +73,11 @@ module.exports = function(sequelize, DataTypes) {
         model: 'account',
         key: 'account_id'
       }
-    }
+    },
+    admin_note: {
+      type: DataTypes.STRING(500),
+      allowNull: true
+    },
   }, {
     sequelize,
     tableName: 'bill',
