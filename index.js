@@ -8,7 +8,8 @@ const { upload, errHandling } = require('./middleware/upload')
 // Allow Cross-Origin requests
 app.use(cors({
     origin: '*',
-    maxAge: 86400
+    maxAge: 86400,
+    methods: ['GET', 'PUT', 'POST', 'OPTIONS', 'HEAD', 'DELETE']
 })); //
 //middleware 
 app.use(bodyParser.json());

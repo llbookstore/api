@@ -166,6 +166,10 @@ module.exports = function(sequelize, DataTypes) {
     avatar: {
       type: DataTypes.STRING(500),
       allowNull: true
+    },
+    address: {
+      type: DataTypes.STRING(500),
+      allowNull: true
     }
   }, {
     sequelize,

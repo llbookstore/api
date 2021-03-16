@@ -50,6 +50,14 @@ module.exports = function(sequelize, DataTypes) {
         model: 'account',
         key: 'account_id'
       }
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'account',
+        key: 'account_id'
+      }
     }
   }, {
     sequelize,
@@ -77,6 +85,13 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "admin_id" },
+        ]
+      },
+      {
+        name: "fk_bill_user_idx",
+        using: "BTREE",
+        fields: [
+          { name: "user_id" },
         ]
       },
     ]
