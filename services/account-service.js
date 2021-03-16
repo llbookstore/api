@@ -190,7 +190,7 @@ module.exports = {
             const findAccById = await account.findByPk(id);
             let { account_name, password, avatar } = findAccById;
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
-            let { phone, email, fullname, birth_date, gender, type, active } = req.body;
+            let { phone, email, fullname, birth_date, gender, type, active, address } = req.body;
             //check update 
             if (birth_date) {
                 if (!timeRegex2.test(birth_date)) return res.json(returnError('400', 'invalid birth-date', {}, path));
@@ -199,7 +199,7 @@ module.exports = {
             }
             const updated_at = getCurrentTimestamp();
             const updated_by = username;
-            const data = { account_name, password, phone, email, full_name: fullname, birth_date, gender, type, active };
+            const data = { account_name, password, phone, email, full_name: fullname, birth_date, gender, type, active, address };
             //validation
             try {
                 const item = await account.build(data);
@@ -219,6 +219,7 @@ module.exports = {
                     active,
                     updated_at,
                     avatar,
+                    address,
                     updated_by
                 },
                 {
