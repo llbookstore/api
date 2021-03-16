@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
-const { bill, bill_detail, account } = db.initModels(sequelize);
+const { bill, bill_detail, account, book } = db.initModels(sequelize);
 
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
 module.exports = {
@@ -57,9 +57,19 @@ module.exports = {
 
     async addBillDetail(req, res, next) {
         try {
+            const { id } = req.params;
+            if (!isNumeric(id)) return res.json(returnError(401, 'invalid params', {}, req.path));
+            const findBill = await bill.findByPk(id);
+            if (!findBill) return res.json(returnError(404, `can't find this bill`, {}, req.path));
+            const { book_id, quantity, price } = req.body;
+            if (!Number.isInteger(book_id) || !Number.isInteger(quantity) || !Number.isInteger(price))
+                return res.json(returnError(401, 'invalid input', {}, req.path));
 
-
-            return res.json(returnSuccess(200, 'OK', {}, req.path));
+            const findBook = await book.findByPk(book_id);
+            if (!findBook) return res.json(returnError(404, `can't find this book`, {}, req.path));
+            const data = { bill_id: id, book_id, quantity, price };
+            const result = await bill_detail.create(data);
+            return res.json(returnSuccess(200, 'OK', result, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));
