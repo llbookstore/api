@@ -53,6 +53,7 @@ module.exports = {
                 where: condition,
                 limit: limit,
                 offset: offset,
+                distinct:true,
                 include: [
                     {
                         model: author,
