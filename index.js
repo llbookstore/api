@@ -16,11 +16,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // app.use(errHandling);
-app.post('/upload', upload.single('profile'), errHandling, (req, res) => {
-    const { ass } = req.body;
-    console.log(ass);
-    console.log(req.file);
-    res.json(req.file)
+app.post('/upload', upload.single('image'), errHandling, (req, res) => {
+    res.json(req.file.filename)
 });
 //images
 app.use('/images', express.static('images')); //dung api file anh public

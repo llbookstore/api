@@ -22,12 +22,14 @@ module.exports = {
                 row_per_page,
                 current_page,
                 active,
-                status
+                status,
+                start_time,
+                end_time
             } = req.query;
             //q - query -> name, author-name, publish_house,
             const limit = parseInt(row_per_page) || normalConfig.row_per_page;
             let offset = 0;
-            if (isNumeric(current_page)) {
+            if (isNumeric(current_page) && current_page > 0) {
                 offset = (parseInt(current_page) - 1) * limit;
             }
             const condition = {
@@ -46,6 +48,12 @@ module.exports = {
                 condition.active = active;
             if (status && status >= 0)
                 condition.status = status;
+            if(start_time &&  timeRegex.test(start_time)){
+                condition.created_at = { [Op.gte]: dateToTimestamp(start_time) }
+            }
+            if(end_time &&  timeRegex.test(end_time)){
+                condition.created_at = { [Op.lte]: dateToTimestamp(end_time) }
+            }
             //
             // if (publishing_id) condition['$publishing.publishing_id$'] = publishing_id;
             // if (author_id) condition['$author.author_id$'] = author_id;
@@ -156,6 +164,7 @@ module.exports = {
                 language,
                 publisher
             };
+            console.log(data);
             if (!!author_id) {
                 const findAuthor = await author.findByPk(author_id);
                 if (!findAuthor) return res.json(returnError(404, `author_id doesn't exist`, {}, req.path));
