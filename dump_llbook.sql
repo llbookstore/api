@@ -24,28 +24,28 @@ DROP TABLE IF EXISTS `account`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `account` (
   `account_id` int NOT NULL AUTO_INCREMENT,
-  `account_name` varchar(45) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `full_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `password` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `email` varchar(45) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `account_name` varchar(45) COLLATE utf8mb4_general_ci NOT NULL,
+  `full_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `birth_date` int DEFAULT NULL,
   `gender` tinyint DEFAULT NULL COMMENT '0 - MAN\\\\\\\\n1 - Woman',
   `type` tinyint NOT NULL DEFAULT '0' COMMENT '0 - common user\\n1 - admin\\n2 - writer\\n3 - approver',
   `active` tinyint(1) DEFAULT '1' COMMENT '0 - inactive\\n1 - active',
   `verify` tinyint(1) DEFAULT '0' COMMENT '0: is not verify\\n1: verified',
   `created_at` int DEFAULT NULL,
-  `created_by` varchar(45) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_by` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `updated_at` int DEFAULT NULL,
-  `updated_by` varchar(45) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `phone` varchar(15) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `avatar` varchar(500) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `address` varchar(500) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `updated_by` varchar(45) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `phone` varchar(15) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `avatar` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `address` varchar(500) COLLATE utf8mb4_general_ci DEFAULT NULL,
   PRIMARY KEY (`account_id`),
   UNIQUE KEY `account_id_UNIQUE` (`account_id`),
   UNIQUE KEY `account_name_UNIQUE` (`account_name`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `phone_UNIQUE` (`phone`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -67,16 +67,16 @@ DROP TABLE IF EXISTS `advisory`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `advisory` (
   `advisory_id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `phone` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `user_note` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `address` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `phone` varchar(15) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_note` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` int DEFAULT NULL,
   `status` tinyint(1) DEFAULT '1' COMMENT '0 - cancel\n1 - pending\n2 - approved',
-  `handle_history` text COLLATE utf8_unicode_ci COMMENT 'array object\n{\n  id: '' '',\n  admin_name: '' '',\n  status: '' '',\n  admin_note: '' '',\n}...',
+  `handle_history` text CHARACTER SET utf8 COLLATE utf8_unicode_ci COMMENT 'array object\n{\n  id: '' '',\n  admin_name: '' '',\n  status: '' '',\n  admin_note: '' '',\n}...',
   PRIMARY KEY (`advisory_id`),
   UNIQUE KEY `advisory_id_UNIQUE` (`advisory_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,7 +107,7 @@ CREATE TABLE `author` (
   `updated_by` varchar(45) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`author_id`),
   UNIQUE KEY `author_id_UNIQUE` (`author_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -146,7 +146,7 @@ CREATE TABLE `bill` (
   KEY `fk_bill_user_idx` (`user_id`),
   CONSTRAINT `bill_fk_acc` FOREIGN KEY (`admin_id`) REFERENCES `account` (`account_id`),
   CONSTRAINT `fk_bill_user` FOREIGN KEY (`user_id`) REFERENCES `account` (`account_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -175,7 +175,7 @@ CREATE TABLE `bill_detail` (
   KEY `bill_detail_fk_book_idx` (`book_id`),
   CONSTRAINT `bill_detail_fk_bill` FOREIGN KEY (`bill_id`) REFERENCES `bill` (`bill_id`),
   CONSTRAINT `bill_detail_fk_book` FOREIGN KEY (`book_id`) REFERENCES `book` (`book_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -492,4 +492,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-26  9:43:49
+-- Dump completed on 2021-03-26  9:56:46
