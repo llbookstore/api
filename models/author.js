@@ -34,6 +34,10 @@ module.exports = function(sequelize, DataTypes) {
     updated_by: {
       type: DataTypes.STRING(45),
       allowNull: true
+    },
+    active: {
+      type: DataTypes.TINYINT,
+      defaultValue: 1
     }
   }, {
     sequelize,

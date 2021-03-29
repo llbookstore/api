@@ -12,7 +12,7 @@ const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
 module.exports = {
     async getAuthors(req, res, next) {
         try {
-            let { q = '', time_start, time_end, current_page, row_per_page } = req.query;
+            let { q = '', time_start, time_end, current_page, row_per_page, active } = req.query;
             const limit = parseInt(row_per_page) || normalConfig.row_per_page;
             let offset = 0;
             if (isNumeric(current_page)) {
@@ -42,6 +42,7 @@ module.exports = {
                 condition.created_at = { [Op.lte]: parseInt(time_end) }
             }
 
+            if (active && (active === '1' || active === '0')) condition.active = active;
             const getAllAuthors = await author.findAndCountAll({
                 where: condition,
                 limit: limit,
@@ -105,7 +106,7 @@ module.exports = {
     async updateAuthor(req, res, next) {
         try {
             const { id } = req.params;
-            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findAuthorById = await author.findOne({
                 where: {
                     author_id: id,
