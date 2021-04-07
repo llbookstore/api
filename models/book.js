@@ -119,20 +119,20 @@ module.exports = function(sequelize, DataTypes) {
         key: 'sale_id'
       }
     },
-    status: {
-      type: DataTypes.TINYINT,
-      allowNull: true,
-      comment: "0 - sắp có\n1 - không bán\n2 - dừng sản xuất\n",
-      validate: {
-        isInt: {
-          msg: 'status must be a number'
-        },
-        checkPositive(item){
-          if(item <0) throw new Error('status must is Positive Integer')
-        }
-      }
+    // status: {
+    //   type: DataTypes.TINYINT,
+    //   allowNull: true,
+    //   comment: "0 - sắp có\n1 - không bán\n2 - dừng sản xuất\n",
+    //   validate: {
+    //     isInt: {
+    //       msg: 'status must be a number'
+    //     },
+    //     checkPositive(item){
+    //       if(item <0) throw new Error('status must is Positive Integer')
+    //     }
+    //   }
     
-    },
+    // },
     updated_at: {
       type: DataTypes.INTEGER,
       allowNull: true

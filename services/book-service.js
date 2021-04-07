@@ -35,6 +35,7 @@ module.exports = {
             const condition = {
                 [Op.or]: [
                     { name: { [Op.substring]: q } },
+                    {book_id: { [Op.substring]: q }},
                     // { '$publishing.name$': { [Op.substring]: q } },
                     { description: { [Op.substring]: q } },
                     // { '$author.name$': { [Op.substring]: q } },
@@ -140,11 +141,13 @@ module.exports = {
                 quantity,
                 price,
                 sale_id,
-                status,
-                language
+                // status,
+                language,
+                image_file_name
             } = req.body;
             let cover_image;
             if (req.file) cover_image = req.file.filename;
+            else if(image_file_name) cover_image = image_file_name;
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
             const data = {
@@ -158,10 +161,10 @@ module.exports = {
                 book_translator,
                 quantity,
                 price,
-                status,
+                // status,
                 created_at,
                 created_by,
-                language,
+                language: language.join(','),
                 publisher
             };
             console.log(data);
@@ -223,10 +226,12 @@ module.exports = {
                 status,
                 publishing_id,
                 publisher,
-                language
+                language,
+                image_file_name
             } = req.body;
             let cover_image;
             if (req.file) cover_image = req.file.filename;
+            else if(image_file_name) cover_image = image_file_name;
             const updated_at = getCurrentTimestamp();
             const updated_by = req.userData.username;
             const data = {
