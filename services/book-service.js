@@ -21,8 +21,8 @@ module.exports = {
                 price_gte,
                 row_per_page,
                 current_page,
-                active,
-                status,
+                active = -1,
+                // status,
                 start_time,
                 end_time
             } = req.query;
@@ -45,10 +45,10 @@ module.exports = {
                 condition.price = { [Op.gte]: price_gte }
             if (price_lte && isNumeric(price_lte))
                 condition.price = { [Op.lte]: price_lte }
-            if (active && (active == 0 || active == 1))
+            if (active > -1 && (active == 0 || active == 1))
                 condition.active = active;
-            if (status && status >= 0)
-                condition.status = status;
+            // if (status && status >= 0)
+            //     condition.status = status;
             if(start_time &&  timeRegex.test(start_time)){
                 condition.created_at = { [Op.gte]: dateToTimestamp(start_time) }
             }
@@ -164,7 +164,7 @@ module.exports = {
                 // status,
                 created_at,
                 created_by,
-                language: language.join(','),
+                language,
                 publisher
             };
             console.log(data);

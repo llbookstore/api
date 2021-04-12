@@ -82,7 +82,7 @@ module.exports = {
     async getAllAccount(req, res, next) {
         const path = req.path;
         try {
-            let { q = '', type, active, row_per_page, current_page, time_start, time_end } = req.query;
+            let { q = '', type = -1, active = -1, row_per_page, current_page, time_start, time_end } = req.query;
             const limit = parseInt(row_per_page) || normalConfig.row_per_page;
             let offset = 0;
             if (isNumeric(current_page)) {
@@ -97,8 +97,8 @@ module.exports = {
                     { phone: { [Op.substring]: q } },
                 ]
             };
-            if (type && type > 0) condition.type = type;
-            if (active && active >= 0 && active <= 1) condition.active = active;
+            if (type > -1) condition.type = type;
+            if (active >= 0 && active <= 1) condition.active = active;
             //find by time
             if (time_start) {
                 if (!timeRegex.test(time_start)) return res.json(returnError('400', 'date invalid', {}, path));
@@ -145,7 +145,7 @@ module.exports = {
         const path = req.path;
         try {
             const { id } = req.params;
-            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findAccById = await account.findOne({
                 attributes: { exclude: ['password'] },
                 include: [
@@ -197,6 +197,16 @@ module.exports = {
                 else
                     birth_date = dateToTimestamp(birth_date, 'DD/MM/YYYY');
             }
+            //check email    
+            if (email && email !== findAccById.email) {
+                const findAccByEmail = await account.findOne({ where: { email } });
+                if (findAccByEmail) return res.json(returnError('410', `email ${email} đã được đăng ký`, {}, path));
+            }
+            if (phone && phone !== findAccById.phone) {
+                const findAccByPhone = await account.findOne({ where: { phone } });
+                if (findAccByPhone) return res.json(returnError('410', `số điện thoại ${phone} đã được đăng ký`, {}, path));
+            }
+            //
             const updated_at = getCurrentTimestamp();
             const updated_by = username;
             const data = { account_name, password, phone, email, full_name: fullname, birth_date, gender, type, active, address };
@@ -279,7 +289,7 @@ module.exports = {
                 return res.json(returnError('401', `invalid input`, {}, path));
             //check username exist ?
             const findAccByUsername = await account.findOne({ where: { account_name: username } });
-            if (!findAccByUsername)
+            if (!findAccByUsername || findAccByUsername.active === 0)
                 return res.json(returnError('401', `username: ${username} doesn't exist`, {}, path));
             //find password
             const hashedPassword = findAccByUsername.password;
