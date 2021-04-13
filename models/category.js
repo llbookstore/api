@@ -19,7 +19,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: true
     },
-    odering: {
+    ordering: {
       type: DataTypes.INTEGER,
       allowNull: true
     },
