@@ -8,5 +8,6 @@ router
     .get('/publishing_house/:id', publishingHouseService.getOnePublishingHouse)
     .post('/publishing_house', auth, upload.single('image'), errHandling, publishingHouseService.addPublishingHouse)
     .put('/publishing_house/:id', auth, upload.single('image'), errHandling, publishingHouseService.updatePublishingHouse)
-    .delete('/publishing_house/:id', auth, publishingHouseService.deletePublishingHose);
+    .delete('/publishing_house/:id', auth, publishingHouseService.deletePublishingHouse)
+    .put('/publishing_house/:id/restore', auth, publishingHouseService.restorePublishingHose);
 module.exports = router
