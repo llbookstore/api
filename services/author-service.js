@@ -7,7 +7,6 @@ const { author } = db.initModels(sequelize);
 //config
 const normalConfig = require('../config/normal');
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
-const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
 
 module.exports = {
     async getAuthors(req, res, next) {
@@ -62,8 +61,6 @@ module.exports = {
                 if (findAuthorById.updated_at)
                     findAuthorById.updated_at = timestampToDate(findAuthorById.updated_at);
             }
-            if (!findAuthorById)
-                return res.json(returnSuccess(200, 'Can not find this author', findAuthorById, path));
             return res.json(returnSuccess(200, 'OK', findAuthorById, path));
         } catch (err) {
             console.log(err);
