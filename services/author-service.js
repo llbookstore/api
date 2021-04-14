@@ -12,7 +12,7 @@ const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
 module.exports = {
     async getAuthors(req, res, next) {
         try {
-            let { q = '', time_start, time_end, current_page, row_per_page, active } = req.query;
+            let { q = '', current_page, row_per_page, active } = req.query;
             const limit = parseInt(row_per_page) || normalConfig.row_per_page;
             let offset = 0;
             if (isNumeric(current_page)) {
@@ -20,29 +20,13 @@ module.exports = {
             }
 
             const condition = {
-                [Op.or]: [{ name: { [Op.substring]: q } }]
+                [Op.or]: [
+                    { name: { [Op.substring]: q } },
+                    { author_id: { [Op.substring]: q } }
+                ]
             };
 
-            //find by time
-            if (time_start) {
-                if (!timeRegex.test(time_start)) return res.json(returnError('400', 'date invalid', {}, req.path));
-                time_start = dateToTimestamp(time_start);
-            }
-            if (time_end) {
-                if (!timeRegex.test(time_end)) return res.json(returnError('400', 'date invalid', {}, req.path));
-                time_end = dateToTimestamp(time_end);
-            }
-            if (time_start && time_end) {
-                condition.created_at = { [Op.between]: [parseInt(time_start), parseInt(time_end)] }
-            }
-            else if (time_start) {
-                condition.created_at = { [Op.gte]: parseInt(time_start) }
-            }
-            else if (time_end) {
-                condition.created_at = { [Op.lte]: parseInt(time_end) }
-            }
-
-            if (active && (active === '1' || active === '0')) condition.active = active;
+            if (active === '1' || active === '0') condition.active = active;
             const getAllAuthors = await author.findAndCountAll({
                 where: condition,
                 limit: limit,
@@ -51,9 +35,9 @@ module.exports = {
             });
             getAllAuthors.rows.map(item => {
                 if (item.dataValues.created_at)
-                    item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
+                    item.dataValues.created_at = timestampToDate(item.dataValues.created_at, 'DD/MM/YYYY');
                 if (item.dataValues.updated_at)
-                    item.dataValues.updated_at = timestampToDate(item.dataValues.updated_at);
+                    item.dataValues.updated_at = timestampToDate(item.dataValues.updated_at, 'DD/MM/YYYY');
                 return item;
             })
 
@@ -89,9 +73,10 @@ module.exports = {
 
     async addAuthor(req, res, next) {
         try {
-            let { name = '', avatar, description } = req.body;
+            let { name = '', avatar, description, avatar_file_name } = req.body;
             if (name.length < 4) return res.json(returnError(400, 'invalid input', {}, req.path));
             if (req.file) avatar = req.file.filename;
+            else if (avatar_file_name) image = avatar_file_name;
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
             const data = { name, avatar, description, created_at, created_by };
@@ -113,10 +98,12 @@ module.exports = {
                 }
             });
             if (!findAuthorById) return res.json(returnError(404, 'can not find the author', {}, req.path));
-            let { name, avatar, description } = req.body;
+            let { name, avatar, description, avatar_file_name } = req.body;
 
             if (name && name.length < 4) return res.json(returnError(400, 'invalid input', {}, req.path));
             if (req.file) avatar = req.file.filename;
+            else if (avatar_file_name) avatar = avatar_file_name;
+            else avatar = findAuthorById.avatar;
             const updated_at = getCurrentTimestamp();
             const updated_by = req.userData.username;
             const data = { name, avatar, description, updated_at, updated_by };
@@ -133,4 +120,36 @@ module.exports = {
             return res.json(returnError(500, err.message, {}, req.path));
         }
     },
+
+    async deleteAuthor(req, res, next) {
+        try {
+            const { id } = req.params;
+            const findAuthor = await author.findByPk(id);
+            if (!findAuthor) return res.json(returnError(404, `can't find the author`, {}, req.path));
+            const updated_at = getCurrentTimestamp();
+            const updated_by = req.userData.username;
+            const data = { updated_at, updated_by, active: 0 }
+            await author.update(data, { where: { author_id: id } });
+            return res.json(returnSuccess(200, 'deleted author successfully!', {}, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    },
+
+    async restoreAuthor(req, res, next) {
+        try {
+            const { id } = req.params;
+            const findAuthor = await author.findByPk(id);
+            if (!findAuthor) return res.json(returnError(404, `can't find the author`, {}, req.path));
+            const updated_at = getCurrentTimestamp();
+            const updated_by = req.userData.username;
+            const data = { updated_at, updated_by, active: 1 }
+            await author.update(data, { where: { author_id: id } });
+            return res.json(returnSuccess(200, 'deleted author successfully!', {}, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    }
 }
