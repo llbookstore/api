@@ -50,6 +50,7 @@ module.exports = {
                 where: condition,
                 limit: limit,
                 offset: offset,
+                distinct:true,
                 order: [['advisory_id', 'DESC']],
             });
             get_advisory.rows.map(item => {

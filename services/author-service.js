@@ -30,6 +30,7 @@ module.exports = {
                 where: condition,
                 limit: limit,
                 offset: offset,
+                distinct:true,
                 order: [['author_id', 'DESC']],
             });
             getAllAuthors.rows.map(item => {

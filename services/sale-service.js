@@ -80,7 +80,8 @@ module.exports = {
             const getSales = await sale.findAndCountAll({ 
                 where: condition,
                 limit: limit,
-                offset: offset
+                offset: offset,
+                distinct:true
             });
             return res.json(returnSuccess(200, 'OK', getSales, req.path));
         } catch (err) {

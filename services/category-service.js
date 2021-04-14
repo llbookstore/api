@@ -26,7 +26,13 @@ module.exports = {
             if (isNumeric(current_page) && current_page > 0) {
                 offset = (parseInt(current_page) - 1) * limit;
             }
-            const result = await category.findAndCountAll({ where: condition, limit, offset });
+            const result = await category.findAndCountAll(
+                {
+                    where: condition,
+                    limit,
+                    offset,
+                    distinct:true
+                });
             result.rows.map(item => {
                 if (item.dataValues.created_at)
                     item.dataValues.created_at = timestampToDate(item.dataValues.created_at, 'DD/MM/YYYY');
@@ -82,7 +88,7 @@ module.exports = {
                 data.ordering = catFirstNum + 1;
             }
             else {
-                const catGroupNum = await category.count({ where: { group_id: group_id} });
+                const catGroupNum = await category.count({ where: { group_id: group_id } });
                 data.ordering = catGroupNum + 1;
             }
 

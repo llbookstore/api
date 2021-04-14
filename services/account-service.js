@@ -123,6 +123,7 @@ module.exports = {
                 where: condition,
                 limit: limit,
                 offset: offset,
+                distinct:true,
                 order: [['account_id', 'ASC']],
             });
             get_account.rows.map(item => {

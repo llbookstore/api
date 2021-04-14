@@ -3,6 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
+const normalConfig = require('../config/normal');
 const { bill, bill_detail, account, book } = db.initModels(sequelize);
 
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
@@ -10,9 +11,49 @@ module.exports = {
 
     async getBills(req, res, next) {
         try {
-
-
-            return res.json(returnSuccess(200, 'OK', {}, req.path));
+            let {
+                q = '',
+                current_page,
+                row_per_page,
+                user_id,
+                status,
+                active
+            } = req.query;
+            const limit = parseInt(row_per_page) || 1;
+            let offset = 0;
+            if (isNumeric(current_page)) {
+                offset = (parseInt(current_page) - 1) * limit;
+            }
+            const condition = {
+                [Op.or]: [
+                    { user_name: { [Op.substring]: q } },
+                    { bill_id: { [Op.substring]: q } },
+                    { phone: { [Op.substring]: q } }
+                ]
+            };
+            if (user_id) condition.user_id = user_id;
+            if (status) condition.status = status;
+            if (active) condition.active = active;
+            const getBills = await bill.findAndCountAll({
+                where: condition,
+                limit: limit,
+                offset: offset,
+                order: [['created_at', 'DESC']],
+                distinct:true,
+                include: [
+                    {
+                        model: bill_detail,
+                        attributes: ['book_id', 'quantity', 'price'],
+                        as: 'bill_details',
+                        include: [{
+                            model: book,
+                            attributes: ['name', 'cover_image'],
+                            as: 'book'
+                        }]
+                    },
+                ],
+            });
+            return res.json(returnSuccess(200, 'OK', getBills, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));
@@ -20,9 +61,26 @@ module.exports = {
     },
     async getBillById(req, res, next) {
         try {
+            const { id } = req.params;
+            const findBillById = await bill.findOne({
+                where: {
+                    bill_id: id,
+                },
+                include: [
+                    {
+                        model: bill_detail,
+                        attributes: ['book_id', 'quantity', 'price'],
+                        as: 'bill_details',
+                        include: [{
+                            model: book,
+                            attributes: ['name', 'cover_image'],
+                            as: 'book'
+                        }]
+                    },
+                ],
 
-
-            return res.json(returnSuccess(200, 'OK', {}, req.path));
+            });
+            return res.json(returnSuccess(200, 'OK', findBillById, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));

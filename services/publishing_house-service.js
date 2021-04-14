@@ -24,7 +24,12 @@ module.exports = {
             if (isNumeric(current_page) && current_page > 0) {
                 offset = (parseInt(current_page) - 1) * limit;
             }
-            const data = await publishing_house.findAndCountAll({ where: condition, limit, offset });
+            const data = await publishing_house.findAndCountAll({
+                where: condition,
+                limit,
+                offset,
+                distinct: true
+            });
             return res.json(returnSuccess(200, 'OK', data, req.path));
         } catch (err) {
             console.log(err);
@@ -49,7 +54,7 @@ module.exports = {
             if (!name) return res.json(returnError(401, 'invalid input', {}, req.path));
             let image;
             if (req.file) image = req.file.filename;
-            else if(logo_file_name) image = logo_file_name;
+            else if (logo_file_name) image = logo_file_name;
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
             const data = { name, description, image, created_at, created_by };
@@ -64,7 +69,7 @@ module.exports = {
     async updatePublishingHouse(req, res, next) {
         try {
             const { id } = req.params;
-            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findPub = await publishing_house.findByPk(id);
             if (!findPub) return res.json(returnError(404, `can't find this publishing_house`, {}, req.path));
             const { name, description, logo_file_name } = req.body;
