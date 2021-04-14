@@ -19,7 +19,7 @@ module.exports = {
                 status,
                 active
             } = req.query;
-            const limit = parseInt(row_per_page) || 1;
+            const limit = parseInt(row_per_page) || normalConfig.row_per_page;
             let offset = 0;
             if (isNumeric(current_page)) {
                 offset = (parseInt(current_page) - 1) * limit;
