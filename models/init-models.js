@@ -38,8 +38,6 @@ function initModels(sequelize) {
   book.belongsToMany(category, { through: category_detail, foreignKey: "book_id", otherKey: "category_id" });
   account.belongsToMany(book, { through: favourite, foreignKey: "acc_id", otherKey: "book_id" });
   book.belongsToMany(account, { through: favourite, foreignKey: "book_id", otherKey: "acc_id" });
-  bill.belongsTo(account, { as: "admin", foreignKey: "admin_id"});
-  account.hasMany(bill, { as: "bills", foreignKey: "admin_id"});
   bill.belongsTo(account, { as: "user", foreignKey: "user_id"});
   account.hasMany(bill, { as: "user_bills", foreignKey: "user_id"});
   bill_detail.belongsTo(bill, { as: "bill", foreignKey: "bill_id"});

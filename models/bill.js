@@ -47,23 +47,15 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TINYINT,
       allowNull: true,
       defaultValue: 0,
-      comment: "0 - pending\n1 - approved\n2 - cancel",
+      comment: "-1 cancel 0 - pending\n1 - approved\n2 - cancel",
       validate: {
         isInt: {
           msg: 'status must be a number (0-2)'
         },
         checkStatus(status) {
-          if (status < 0 || status > 2)
+          if (status < -2 || status > 4)
             throw new Error('status is invalid!');
         }
-      }
-    },
-    admin_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'account',
-        key: 'account_id'
       }
     },
     user_id: {
@@ -74,8 +66,8 @@ module.exports = function(sequelize, DataTypes) {
         key: 'account_id'
       }
     },
-    admin_note: {
-      type: DataTypes.STRING(500),
+    handle_history: {
+      type: DataTypes.TEXT,
       allowNull: true
     },
   }, {
@@ -97,13 +89,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "bill_id" },
-        ]
-      },
-      {
-        name: "bill_fk_acc_idx",
-        using: "BTREE",
-        fields: [
-          { name: "admin_id" },
         ]
       },
       {

@@ -17,7 +17,9 @@ module.exports = {
                 row_per_page,
                 user_id,
                 status,
-                active
+                active,
+                date_start,
+                date_end
             } = req.query;
             const limit = parseInt(row_per_page) || normalConfig.row_per_page;
             let offset = 0;
@@ -34,12 +36,17 @@ module.exports = {
             if (user_id) condition.user_id = user_id;
             if (status) condition.status = status;
             if (active) condition.active = active;
+            if (date_start) condition.created_at = { [Op.gte]: date_start };
+            if (date_end) condition.created_at = { [Op.lte]: date_end };
+            if (date_start && date_end) {
+                condition.created_at = { [Op.between]: [dateToTimestamp(date_start), dateToTimestamp(date_end)] };
+            }
             const getBills = await bill.findAndCountAll({
                 where: condition,
                 limit: limit,
                 offset: offset,
                 order: [['created_at', 'DESC']],
-                distinct:true,
+                distinct: true,
                 include: [
                     {
                         model: bill_detail,
@@ -62,10 +69,13 @@ module.exports = {
     async getBillById(req, res, next) {
         try {
             const { id } = req.params;
+            const { user_id } = req.query;
+            const condition = {
+                bill_id: id
+            };
+            if (user_id) condition.user_id = user_id;
             const findBillById = await bill.findOne({
-                where: {
-                    bill_id: id,
-                },
+                where: condition,
                 include: [
                     {
                         model: bill_detail,
@@ -136,9 +146,25 @@ module.exports = {
 
     async handleBill(req, res, next) {
         try {
-
-
-            return res.json(returnSuccess(200, 'OK', {}, req.path));
+            const { id } = req.params;
+            const { status, note = '', admin_id, admin_name } = req.body;
+            const findBillById = await bill.findByPk(id);
+            if (!findBillById) {
+                return res.json(returnError(404, `can't find this bill`, {}, req.path));
+            }
+            const { handle_history } = findBillById;
+            const handleAt = getCurrentTimestamp();
+            const adminHandle = {
+                admin_id,
+                admin_name,
+                note,
+                status,
+                handled_at: handleAt
+            }
+            const newHandleHistory = handle_history ? [...JSON.parse(handle_history), adminHandle] : [adminHandle];
+            const updateBillHistory = { status, handle_history: JSON.stringify(newHandleHistory) };
+            await bill.update(updateBillHistory, { where: { bill_id: id } });
+            return res.json(returnSuccess(200, 'handle bill successful', {}, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));
