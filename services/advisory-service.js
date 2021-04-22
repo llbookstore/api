@@ -6,8 +6,7 @@ const db = require('../models/init-models');
 const { advisory } = db.initModels(sequelize);
 //config
 const normalConfig = require('../config/normal');
-const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
-const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
+const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, isNumeric } = require('../utils/common');
 
 module.exports = {
     async getAdvisory(req, res, next) {
@@ -25,17 +24,7 @@ module.exports = {
                     { phone: { [Op.substring]: q } },
                 ]
             };
-
             if (status && status > -1) condition.status = status;
-            //find by time
-            if (time_start) {
-                if (!timeRegex.test(time_start)) return res.json(returnError('400', 'date invalid', {}, req.path));
-                time_start = dateToTimestamp(time_start);
-            }
-            if (time_end) {
-                if (!timeRegex.test(time_end)) return res.json(returnError('400', 'date invalid', {}, req.path));
-                time_end = dateToTimestamp(time_end);
-            }
             if (time_start && time_end) {
                 condition.created_at = { [Op.between]: [parseInt(time_start), parseInt(time_end)] }
             }
@@ -55,7 +44,7 @@ module.exports = {
             });
             get_advisory.rows.map(item => {
                 if (item.dataValues.created_at)
-                    item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
+                    item.dataValues.created_at = timestampToDate(item.dataValues.created_at, 'DD/MM/YYYY LT');
                 return item;
             })
 
@@ -71,8 +60,7 @@ module.exports = {
         try {
             const { username, phone, user_note, address } = req.body;
             if (!username || !phone || !user_note) return res.json(returnError(500, 'invalid input', {}, path));
-            const status = 0;
-            const advisoryData = { username, phone, user_note, status, address };
+            const advisoryData = { username, phone, user_note, address };
             try {
                 const item = await advisory.build(advisoryData);
                 const validatedItem = await item.validate();
@@ -95,8 +83,8 @@ module.exports = {
     async responseAdvisory(req, res, next) {
         try {
             const { id } = req.params;
-            const { status, note } = req.body;
-            if (!status || !note) {
+            const { status, note = ''} = req.body;
+            if (status < 0) {
                 return res.json(returnError(500, 'invalid input', {}, req.path));
             }
             const { userId, username } = req.userData;
@@ -106,16 +94,15 @@ module.exports = {
             }
 
             let { handle_history } = findAdvisoryWithId;
-            if (handle_history[0] !== '[') handle_history = '[]';
-            const handle_at = getCurrentTimestamp();
-            const adminHanlde = {
+            const handleAt = getCurrentTimestamp();
+            const handleAdvisory = {
                 admin_id: userId,
-                admin: username,
+                admin_name: username,
                 note,
                 status,
-                handle_at
+                handled_at: handleAt
             }
-            const newHandleHistory = handle_history ? [...JSON.parse(handle_history), adminHanlde] : [adminHanlde];
+            const newHandleHistory = handle_history ? [...JSON.parse(handle_history), handleAdvisory] : [handleAdvisory];
             const updateAdvisory = { status, handle_history: JSON.stringify(newHandleHistory) };
 
             const resAdvisory = await advisory.update(updateAdvisory, { where: { advisory_id: id } });

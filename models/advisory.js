@@ -37,7 +37,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TINYINT,
       allowNull: true,
       defaultValue: 1,
-      comment: "0 - cancel\n1 - pending\n2 - approved",
+      comment: "0 - cancel\n1 - pending\n2 - processing \n3 - approved",
       validate: {
         isInt: {
           msg: 'status must be a number'
