@@ -55,6 +55,9 @@ module.exports = {
             if(end_time &&  timeRegex.test(end_time)){
                 condition.created_at = { [Op.lte]: dateToTimestamp(end_time) }
             }
+            if(start_time && end_time){
+                condition.created_at = {[Op.between]: [dateToTimestamp(start_time),dateToTimestamp(end_time)]}
+            }
             //
             // if (publishing_id) condition['$publishing.publishing_id$'] = publishing_id;
             // if (author_id) condition['$author.author_id$'] = author_id;
