@@ -42,8 +42,20 @@ module.exports = function(sequelize, DataTypes) {
     status: {
       type: DataTypes.TINYINT,
       allowNull: true,
-      comment: "0 - draft\n1 - published\n2 - pending\n3 - approved"
-    }
+      comment: "0 - cancel\n1 - draft\n2 - publish"
+    },
+    thumbnail: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    source: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    summary: {
+      type: DataTypes.STRING(500),
+      allowNull: true
+    },
   }, {
     sequelize,
     tableName: 'news',

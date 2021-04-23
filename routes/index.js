@@ -7,6 +7,7 @@ const sale = require('./sale');
 const book = require('./book');
 const publishing_house = require('./publishing_house');
 const bill = require('./bill');
+const news = require('./news');
 module.exports = function (app) {
     app.use('/', account);
     app.use('/', advisory);
@@ -16,4 +17,5 @@ module.exports = function (app) {
     app.use('/', book);
     app.use('/', publishing_house);
     app.use('/', bill);
+    app.use('/', news);
 }
