@@ -1,12 +1,12 @@
 const express = require('express');
-const auth = require('../middleware/authentication');
+const { adminAuth } = require('../middleware/authentication');
 const router = express.Router();
 const categoryService = require('../services/category-service');
 router
-    .post('/category', auth, categoryService.addCategory)
+    .post('/category', adminAuth, categoryService.addCategory)
     .get('/category', categoryService.getCategories)
     .get('/category/:id', categoryService.getCategoryById)
-    .put('/category/:id', auth,categoryService.updateCategory)
-    .delete('/category/:id', auth, categoryService.deleteCategory)
+    .put('/category/:id', adminAuth,categoryService.updateCategory)
+    .delete('/category/:id', adminAuth, categoryService.deleteCategory)
 
 module.exports = router
