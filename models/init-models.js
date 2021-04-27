@@ -8,7 +8,7 @@ var _book = require("./book");
 var _cart = require("./cart");
 var _category = require("./category");
 var _category_detail = require("./category_detail");
-var _comment = require("./comment");
+var _review = require("./review");
 var _favourite = require("./favourite");
 var _news = require("./news");
 var _publishing_house = require("./publishing_house");
@@ -24,7 +24,7 @@ function initModels(sequelize) {
   var cart = _cart(sequelize, DataTypes);
   var category = _category(sequelize, DataTypes);
   var category_detail = _category_detail(sequelize, DataTypes);
-  var comment = _comment(sequelize, DataTypes);
+  var review = _review(sequelize, DataTypes);
   var favourite = _favourite(sequelize, DataTypes);
   var news = _news(sequelize, DataTypes);
   var publishing_house = _publishing_house(sequelize, DataTypes);
@@ -58,10 +58,10 @@ function initModels(sequelize) {
   category.hasMany(category_detail, { as: "category_details", foreignKey: "category_id"});
   category_detail.belongsTo(book, { as: "book", foreignKey: "book_id"});
   book.hasMany(category_detail, { as: "category_details", foreignKey: "book_id"});
-  comment.belongsTo(account, { as: "acc", foreignKey: "acc_id"});
-  account.hasMany(comment, { as: "comments", foreignKey: "acc_id"});
-  comment.belongsTo(book, { as: "book", foreignKey: "book_id"});
-  book.hasMany(comment, { as: "comments", foreignKey: "book_id"});
+  review.belongsTo(account, { as: "acc", foreignKey: "acc_id"});
+  account.hasMany(review, { as: "reviews", foreignKey: "acc_id"});
+  review.belongsTo(book, { as: "book", foreignKey: "book_id"});
+  book.hasMany(review, { as: "reviews", foreignKey: "book_id"});
   favourite.belongsTo(account, { as: "acc", foreignKey: "acc_id"});
   account.hasMany(favourite, { as: "favourites", foreignKey: "acc_id"});
   favourite.belongsTo(book, { as: "book", foreignKey: "book_id"});
@@ -77,7 +77,7 @@ function initModels(sequelize) {
     cart,
     category,
     category_detail,
-    comment,
+    review,
     favourite,
     news,
     publishing_house,

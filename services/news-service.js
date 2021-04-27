@@ -30,7 +30,6 @@ module.exports = {
                 where: condition,
                 limit: limit,
                 offset: offset,
-                distinct: true,
                 order: [['created_at', 'DESC']],
             });
             return res.json(returnSuccess(200, 'OK', getAllNews, req.path));
@@ -62,6 +61,10 @@ module.exports = {
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
             const data = { title, thumbnail, summary, source, description, status, created_at, created_by };
+            if(status === 1){
+                data.published_at = created_at,
+                data.published_by = created_by
+            }
             const creNews = await news.create(data);
             return res.json(returnSuccess(200, 'added a news successfully', creNews, req.path));
         } catch (err) {

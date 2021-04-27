@@ -83,7 +83,7 @@ module.exports = {
                         as: 'bill_details',
                         include: [{
                             model: book,
-                            attributes: ['name', 'cover_image'],
+                            attributes: ['name', 'cover_image', 'book_id'],
                             as: 'book'
                         }]
                     },

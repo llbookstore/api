@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('book', {
     book_id: {
       autoIncrement: true,
@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       validate: {
         checkNameLength(name) {
-          if(name.length < 2)
+          if (name.length < 2)
             throw new Error('name must have more than 2 characters!')
         }
       }
@@ -44,8 +44,8 @@ module.exports = function(sequelize, DataTypes) {
         isInt: {
           msg: 'pages must be a integer'
         },
-        checkPositive(item){
-          if(item <0) throw new Error('pages must is Positive Integer')
+        checkPositive(item) {
+          if (item < 0) throw new Error('pages must is Positive Integer')
         }
       }
     },
@@ -61,8 +61,8 @@ module.exports = function(sequelize, DataTypes) {
         isInt: {
           msg: 'weight must be a number'
         },
-        checkPositive(item){
-          if(item <0) throw new Error('weight must is Positive Integer')
+        checkPositive(item) {
+          if (item < 0) throw new Error('weight must is Positive Integer')
         }
       }
     },
@@ -90,8 +90,8 @@ module.exports = function(sequelize, DataTypes) {
         isInt: {
           msg: 'quantity must be a number'
         },
-        checkPositive(item){
-          if(item <0) throw new Error('quantity must is Positive Integer')
+        checkPositive(item) {
+          if (item < 0) throw new Error('quantity must is Positive Integer')
         }
       }
     },
@@ -102,8 +102,8 @@ module.exports = function(sequelize, DataTypes) {
         isInt: {
           msg: 'price must be a number'
         },
-        checkPositive(item){
-          if(item <0) throw new Error('quantity must is Positive Integer')
+        checkPositive(item) {
+          if (item < 0) throw new Error('quantity must is Positive Integer')
         }
       }
     },
@@ -131,7 +131,7 @@ module.exports = function(sequelize, DataTypes) {
     //       if(item <0) throw new Error('status must is Positive Integer')
     //     }
     //   }
-    
+
     // },
     updated_at: {
       type: DataTypes.INTEGER,
@@ -154,13 +154,17 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: 1,
     },
-  publishing_id: {
+    publishing_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
         model: 'publishing_house',
         key: 'publishing_id'
       }
+    },
+    rating: {
+      type: DataTypes.DOUBLE,
+      allowNull: true
     }
   }, {
     sequelize,
@@ -197,7 +201,7 @@ module.exports = function(sequelize, DataTypes) {
           { name: "sale_id" },
         ]
       },
-{
+      {
         name: "book_fk_publishing_idx",
         using: "BTREE",
         fields: [

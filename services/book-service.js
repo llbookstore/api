@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
-const { book, author, sale, publishing_house, category_detail, favourite, cart } = db.initModels(sequelize);
+const { book, author, sale, publishing_house, category_detail, favourite, cart, review } = db.initModels(sequelize);
 //config
 const normalConfig = require('../config/normal');
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
@@ -86,7 +86,13 @@ module.exports = {
                         model: category_detail,
                         as: 'category_details',
                         attributes: ['category_id'],
-                    }]
+                    },
+                    {
+                        model: review,
+                        as: 'reviews',
+                        attributes: { exclude: ['accepted_at','accepted_by'] }
+                    },
+                ]
             });
 
             return res.json(returnSuccess(200, 'OK', findBook, req.path));

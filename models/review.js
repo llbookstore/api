@@ -1,8 +1,9 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('comment', {
-    comment_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+  return sequelize.define('review', {
+    review_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
       allowNull: false,
       primaryKey: true
     },
@@ -22,27 +23,37 @@ module.exports = function(sequelize, DataTypes) {
         key: 'book_id'
       }
     },
-    content: {
+    comment: {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    is_first_comment: {
-      type: DataTypes.BOOLEAN,
-      allowNull: true,
-      defaultValue: false,
-      comment: "0 - false\n1 - true"
+    full_name: {
+      type: DataTypes.STRING(255),
+      allowNull: true
     },
-    parent_comment_id: {
+    rating: {
       type: DataTypes.INTEGER,
       allowNull: true
     },
     created_at: {
       type: DataTypes.INTEGER,
       allowNull: true
-    }
+    },
+    status: {
+      type: DataTypes.TINYINT,
+      defaultValue: 0
+    },
+    accepted_by: {
+      type: DataTypes.STRING(45),
+      allowNull: true
+    },
+    accepted_at: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
   }, {
     sequelize,
-    tableName: 'comment',
+    tableName: 'review',
     timestamps: false,
     indexes: [
       {
@@ -50,21 +61,23 @@ module.exports = function(sequelize, DataTypes) {
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "comment_id" },
+          { name: "review_id" },
         ]
       },
       {
-        name: "comment_fk_book_idx",
+        name: "review_fk_book_idx",
         using: "BTREE",
         fields: [
           { name: "book_id" },
         ]
       },
       {
-        name: "comment_fk_account_idx",
+        name: "index4",
         using: "BTREE",
+        unique: true,
         fields: [
           { name: "acc_id" },
+          { name: "book_id" }
         ]
       },
     ]
