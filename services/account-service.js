@@ -123,7 +123,7 @@ module.exports = {
                 where: condition,
                 limit: limit,
                 offset: offset,
-                distinct:true,
+                distinct: true,
                 order: [['account_id', 'ASC']],
             });
             get_account.rows.map(item => {
@@ -191,7 +191,7 @@ module.exports = {
             const findAccById = await account.findByPk(id);
             let { account_name, password, avatar } = findAccById;
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
-            let { phone, email, fullname, birth_date, gender, type, active, address } = req.body;
+            let { phone, email, fullname, birth_date, gender, type, active, address, avatar: avatarBody } = req.body;
             //check update 
             if (birth_date) {
                 if (!timeRegex2.test(birth_date)) return res.json(returnError('400', 'invalid birth-date', {}, path));
@@ -219,6 +219,7 @@ module.exports = {
                 return res.json(returnError('400', err.message, {}, path));
             }
             if (req.file) avatar = req.file.filename;
+            else if (avatarBody) avatar = avatarBody;
             const result = account.update(
                 {
                     phone,
