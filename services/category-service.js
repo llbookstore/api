@@ -78,11 +78,11 @@ module.exports = {
 
     async addCategory(req, res, next) {
         try {
-            const { name = '', quantity = 0, group_id = -1 } = req.body;
+            const { name = '', group_id = -1 } = req.body;
             if (name.length < 4) return res.json(returnError(400, 'invalid input', {}, req.path));
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
-            const data = { name, quantity, group_id, created_at, created_by };
+            const data = { name, group_id, created_at, created_by };
             if (group_id === -1) {
                 const catFirstNum = await category.count({ where: { group_id: -1 } });
                 data.ordering = catFirstNum + 1;
@@ -106,16 +106,15 @@ module.exports = {
             // if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findCatById = await category.findByPk(id);
             if (!findCatById) return res.json(returnError(404, `can't find the category`, {}, req.path));
-            const { name, quantity, group_id, active, ordering } = req.body;
+            const { name, group_id, active, ordering } = req.body;
             if (
-                (quantity && !Number.isInteger(quantity)) ||
                 (ordering && !Number.isInteger(ordering)) ||
                 (name && name.length < 4)
             )
                 return res.json(returnError(400, 'invalid input', {}, req.path));
             const updated_at = getCurrentTimestamp();
             const updated_by = req.userData.username;
-            const data = { name, quantity, group_id, updated_at, updated_by, active };
+            const data = { name, group_id, updated_at, updated_by, active };
             if (active === '1' || active === '0') data.active = active;
             if (ordering) data.ordering = ordering;
             await category.update(
