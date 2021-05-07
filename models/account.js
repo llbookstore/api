@@ -103,21 +103,21 @@ module.exports = function(sequelize, DataTypes) {
         }
       }
     },
-    verify: {
-      type: DataTypes.TINYINT(1),
-      allowNull: true,
-      defaultValue: 0,
-      comment: "0: is not verify\\n1: verified",
-      validate: {
-        isInt: {
-          msg: 'verify must be a number (0-1)'
-        },
-        checkStatus(status) {
-          if (status < 0 || status > 1)
-            throw new Error('verify is invalid!');
-        }
-      }
-    },
+    // verify: {
+    //   type: DataTypes.TINYINT(1),
+    //   allowNull: true,
+    //   defaultValue: 0,
+    //   comment: "0: is not verify\\n1: verified",
+    //   validate: {
+    //     isInt: {
+    //       msg: 'verify must be a number (0-1)'
+    //     },
+    //     checkStatus(status) {
+    //       if (status < 0 || status > 1)
+    //         throw new Error('verify is invalid!');
+    //     }
+    //   }
+    // },
     created_at: {
       type: DataTypes.INTEGER,
       allowNull: true,
