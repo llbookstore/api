@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 //db
 const sequelize = require('../config/connectDB');
 const db = require('../models/init-models');
-const { book, author, sale, publishing_house, category_detail, favourite, cart, review } = db.initModels(sequelize);
+const { book, author, sale, publishing_house, category_detail, favourite, cart, review, account } = db.initModels(sequelize);
 //config
 const normalConfig = require('../config/normal');
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
@@ -35,7 +35,7 @@ module.exports = {
             const condition = {
                 [Op.or]: [
                     { name: { [Op.substring]: q } },
-                    {book_id: { [Op.substring]: q }},
+                    { book_id: { [Op.substring]: q } },
                     // { '$publishing.name$': { [Op.substring]: q } },
                     { description: { [Op.substring]: q } },
                     // { '$author.name$': { [Op.substring]: q } },
@@ -49,14 +49,14 @@ module.exports = {
                 condition.active = active;
             // if (status && status >= 0)
             //     condition.status = status;
-            if(start_time &&  timeRegex.test(start_time)){
+            if (start_time && timeRegex.test(start_time)) {
                 condition.created_at = { [Op.gte]: dateToTimestamp(start_time) }
             }
-            if(end_time &&  timeRegex.test(end_time)){
+            if (end_time && timeRegex.test(end_time)) {
                 condition.created_at = { [Op.lte]: dateToTimestamp(end_time) }
             }
-            if(start_time && end_time){
-                condition.created_at = {[Op.between]: [dateToTimestamp(start_time),dateToTimestamp(end_time)]}
+            if (start_time && end_time) {
+                condition.created_at = { [Op.between]: [dateToTimestamp(start_time), dateToTimestamp(end_time)] }
             }
             //
             // if (publishing_id) condition['$publishing.publishing_id$'] = publishing_id;
@@ -65,7 +65,7 @@ module.exports = {
                 where: condition,
                 limit: limit,
                 offset: offset,
-                distinct:true,
+                distinct: true,
                 include: [
                     {
                         model: author,
@@ -90,7 +90,14 @@ module.exports = {
                     {
                         model: review,
                         as: 'reviews',
-                        attributes: { exclude: ['accepted_at','accepted_by'] }
+                        attributes: { exclude: ['accepted_at', 'accepted_by'] },
+                        include: [
+                            {
+                                model: account,
+                                attributes: ['avatar'],
+                                as: 'acc'
+                            }
+                        ]
                     },
                 ]
             });
@@ -156,7 +163,7 @@ module.exports = {
             } = req.body;
             let cover_image;
             if (req.file) cover_image = req.file.filename;
-            else if(image_file_name) cover_image = image_file_name;
+            else if (image_file_name) cover_image = image_file_name;
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
             const data = {
@@ -215,7 +222,7 @@ module.exports = {
     async updateBook(req, res, next) {
         try {
             const { id } = req.params;
-            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findBookById = await book.findByPk(id);
             if (!findBookById) return res.json(returnError(404, `this book doesn't exist`, {}, req.path));
             const {
@@ -240,7 +247,7 @@ module.exports = {
             } = req.body;
             let cover_image;
             if (req.file) cover_image = req.file.filename;
-            else if(image_file_name) cover_image = image_file_name;
+            else if (image_file_name) cover_image = image_file_name;
             const updated_at = getCurrentTimestamp();
             const updated_by = req.userData.username;
             const data = {
@@ -298,7 +305,7 @@ module.exports = {
     async addBookCategories(req, res, next) {
         try {
             const { id } = req.params;
-            if(!isNumeric(id)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findBookById = await book.findByPk(id);
             if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
 
@@ -321,7 +328,7 @@ module.exports = {
     async addFavourite(req, res, next) {
         try {
             const { bookId } = req.params;
-            if(!isNumeric(bookId)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(bookId)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findBookById = book.findByPk(bookId);
             if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
             const { userId } = req.userData;
@@ -337,7 +344,7 @@ module.exports = {
     async removeFavourite(req, res, next) {
         try {
             const { bookId } = req.params;
-            if(!isNumeric(bookId)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(bookId)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findBookById = book.findByPk(bookId);
             if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
             const { userId } = req.userData;
@@ -352,13 +359,13 @@ module.exports = {
     async addCart(req, res, next) {
         try {
             const { bookId } = req.params;
-            if(!isNumeric(bookId)) return res.json(returnError(400,'invalid id', {}, req.path));
+            if (!isNumeric(bookId)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findBookById = await book.findByPk(bookId);
             if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
 
             const { quantity } = req.body;
             if (Number.isNaN(quantity)) return res.json(returnError(401, 'invalid input', {}, req.path));
-            if(quantity > findBookById.quantity) return res.json(returnError(400,'over book quantity', {}, req.path));
+            if (quantity > findBookById.quantity) return res.json(returnError(400, 'over book quantity', {}, req.path));
             const { userId } = req.userData;
             const findCart = await cart.findOne({ where: { book_id: bookId, acc_id: userId } });
             let createCart;
@@ -379,12 +386,12 @@ module.exports = {
     async removeCart(req, res, next) {
         try {
             const { bookId } = req.params;
-            if(!isNumeric(bookId)) return res.json(returnError(400,'invalid id', {}, req.path));
-            const findBookById = await book.findOne({where: {book_id: bookId}});
+            if (!isNumeric(bookId)) return res.json(returnError(400, 'invalid id', {}, req.path));
+            const findBookById = await book.findOne({ where: { book_id: bookId } });
             if (!findBookById) return res.json(returnError(404, `can't find this book`, {}, req.path));
             const { userId } = req.userData;
             const data = { book_id: bookId, acc_id: userId };
-            const rmCart = await cart.destroy({where: data});
+            const rmCart = await cart.destroy({ where: data });
             return res.json(returnSuccess(200, 'remove book to cart successful!', rmCart, req.path));
         } catch (err) {
             console.log(err);
