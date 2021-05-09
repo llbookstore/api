@@ -64,7 +64,7 @@ module.exports = {
 
     async getSales(req, res, next) {
         try {
-            const { q, active, current_page, row_per_page } = req.query;
+            const { q = '', active, current_page, row_per_page } = req.query;
             const limit = parseInt(row_per_page) || normalConfig.row_per_page;
             let offset = 0;
             if (isNumeric(current_page)) {
@@ -80,8 +80,7 @@ module.exports = {
             const getSales = await sale.findAndCountAll({ 
                 where: condition,
                 limit: limit,
-                offset: offset,
-                distinct:true
+                offset: offset
             });
             return res.json(returnSuccess(200, 'OK', getSales, req.path));
         } catch (err) {

@@ -199,6 +199,13 @@ module.exports = {
                 if (!findPub) return res.json(returnError(404, `publishing_id doesn't exist`, {}, req.path));
                 data.publishing_id = publishing_id;
             }
+            const findBookByName = await book.findOne({
+                where: {
+                    name: name
+                }
+            });
+            if (findBookByName)
+                return res.json(returnError(401, `Tên cuốn sách này đã tồn tại`, {}, req.path));
             if (published_date) {
                 if (!timeRegex.test(published_date))
                     return res.json(returnError(400, 'invalid input date', {}, req.path));

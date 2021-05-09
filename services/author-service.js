@@ -73,6 +73,13 @@ module.exports = {
         try {
             let { name = '', avatar, description, avatar_file_name } = req.body;
             if (name.length < 4) return res.json(returnError(400, 'invalid input', {}, req.path));
+            const findAuthorByName = await author.findOne({
+                where: {
+                    name: name.trim()
+                }
+            });
+            if (findAuthorByName)
+                return res.json(returnError(401, `Tên tác giả này đã tồn tại`, {}, req.path));
             if (req.file) avatar = req.file.filename;
             else if (avatar_file_name) image = avatar_file_name;
             const created_at = getCurrentTimestamp();

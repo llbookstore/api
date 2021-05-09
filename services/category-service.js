@@ -80,6 +80,13 @@ module.exports = {
         try {
             const { name = '', group_id = -1 } = req.body;
             if (name.length < 4) return res.json(returnError(400, 'invalid input', {}, req.path));
+            const findCatByName = await category.findOne({
+                where: {
+                    name: name.trim()
+                }
+            });
+            if (findCatByName)
+                return res.json(returnError(401, `Tên danh mục sách này đã tồn tại`, {}, req.path));
             const created_at = getCurrentTimestamp();
             const created_by = req.userData.username;
             const data = { name, group_id, created_at, created_by };

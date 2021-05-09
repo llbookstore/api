@@ -52,6 +52,13 @@ module.exports = {
         try {
             const { name, description, logo_file_name } = req.body;
             if (!name) return res.json(returnError(401, 'invalid input', {}, req.path));
+            const findPubByName = await author.findOne({
+                where: {
+                    name: name.trim()
+                }
+            });
+            if (findPubByName)
+                return res.json(returnError(401, `Tên nhà phát hành này đã tồn tại`, {}, req.path));
             let image;
             if (req.file) image = req.file.filename;
             else if (logo_file_name) image = logo_file_name;
