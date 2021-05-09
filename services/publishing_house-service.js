@@ -52,7 +52,7 @@ module.exports = {
         try {
             const { name, description, logo_file_name } = req.body;
             if (!name) return res.json(returnError(401, 'invalid input', {}, req.path));
-            const findPubByName = await author.findOne({
+            const findPubByName = await publishing_house.findOne({
                 where: {
                     name: name.trim()
                 }
