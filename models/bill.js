@@ -70,6 +70,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TEXT,
       allowNull: true
     },
+    is_paid: {
+      type: DataTypes.TINYINT,
+      allowNull: true,
+    },
+    paid_time: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    }
   }, {
     sequelize,
     tableName: 'bill',

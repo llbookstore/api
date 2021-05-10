@@ -147,7 +147,7 @@ module.exports = {
     async handleBill(req, res, next) {
         try {
             const { id } = req.params;
-            const { status, note = '', } = req.body;
+            const { status, note = '', is_paid } = req.body;
             const findBillById = await bill.findByPk(id);
             if (!findBillById) {
                 return res.json(returnError(404, `can't find this bill`, {}, req.path));
@@ -160,10 +160,16 @@ module.exports = {
                 admin_name: username,
                 note,
                 status,
+                is_paid,
                 handled_at: handleAt
             }
             const newHandleHistory = handle_history ? [...JSON.parse(handle_history), adminHandle] : [adminHandle];
             const updateBillHistory = { status, handle_history: JSON.stringify(newHandleHistory) };
+            if(is_paid === 1)
+                {
+                    updateBillHistory.is_paid = is_paid;
+                    updateBillHistory.paid_time = getCurrentTimestamp();
+                }
             await bill.update(updateBillHistory, { where: { bill_id: id } });
             if(status == 3) {
                     const getAllBillDetails = await bill_detail.findAll({
