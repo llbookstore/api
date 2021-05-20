@@ -239,4 +239,14 @@ module.exports = {
             return res.json(returnError(500, err.message, {}, req.path));
         }
     },
+    async cancelBill(req, res, next) {
+        try {
+            const { id } = req.params;
+            await bill.update({status: -1}, { where: { bill_id: id } });
+            return res.json(returnSuccess(200,'cancel bill successfully', {}, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    }
 }

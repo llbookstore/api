@@ -11,5 +11,6 @@ router
     .put('/bill/:id', adminAuth, billService.handleBill)
     .post('/bill/revenue_stat', adminAuth, billService.revenueStat)
     .post('/bill/revenue_cod_stat', adminAuth, billService.revenueCodStat)
+    .delete('/bill/:id/cancel', commonAuth, billService.cancelBill)
 
 module.exports = router
