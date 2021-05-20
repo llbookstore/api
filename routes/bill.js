@@ -9,5 +9,7 @@ router
     .post('/bill', commonAuth, billService.addBill)
     .post('/bill/:id/detail', commonAuth, billService.addBillDetail)
     .put('/bill/:id', adminAuth, billService.handleBill)
+    .post('/bill/revenue_stat', adminAuth, billService.revenueStat)
+    .post('/bill/revenue_cod_stat', adminAuth, billService.revenueCodStat)
 
 module.exports = router

@@ -165,33 +165,78 @@ module.exports = {
             }
             const newHandleHistory = handle_history ? [...JSON.parse(handle_history), adminHandle] : [adminHandle];
             const updateBillHistory = { status, handle_history: JSON.stringify(newHandleHistory) };
-            if(is_paid === 1)
-                {
-                    updateBillHistory.is_paid = is_paid;
-                    updateBillHistory.paid_time = getCurrentTimestamp();
-                }
+            if (is_paid === 1) {
+                updateBillHistory.is_paid = is_paid;
+                updateBillHistory.paid_time = getCurrentTimestamp();
+            }
             await bill.update(updateBillHistory, { where: { bill_id: id } });
-            if(status == 3) {
-                    const getAllBillDetails = await bill_detail.findAll({
-                        where: {
-                            bill_id: id
-                        }
-                    });
-                    for (const item of getAllBillDetails) {
-                           const getBook = await book.findByPk(item.book_id);
-                           await book.update({
-                               quantity: getBook.quantity - item.quantity
-                           },{
-                               where: {
-                                   book_id: item.book_id
-                               }
-                           })
+            if (status == 3) {
+                const getAllBillDetails = await bill_detail.findAll({
+                    where: {
+                        bill_id: id
                     }
+                });
+                for (const item of getAllBillDetails) {
+                    const getBook = await book.findByPk(item.book_id);
+                    await book.update({
+                        quantity: getBook.quantity - item.quantity
+                    }, {
+                        where: {
+                            book_id: item.book_id
+                        }
+                    })
+                }
             }
             return res.json(returnSuccess(200, 'handle bill successful', {}, req.path));
         } catch (err) {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));
+        }
+    },
+
+    async revenueStat(req, res, next) {
+        try {
+            const {
+                date_start,
+                date_end
+            } = req.body;
+            if (!date_start || !date_end) return res.json(returnError(401, 'invalid input', {}, req.path));
+            const getBills = await bill.findAll({
+                attributes: ['bill_id', 'payment_method', 'total_price', 'created_at', 'status'],
+                where: {
+                    created_at: {
+                        [Op.between]: [date_start, date_end]
+                    },
+                    status: 3
+                }
+            })
+            return res.json(returnSuccess(200, 'ok', getBills, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
+        }
+    },
+
+    async revenueCodStat(req, res, next) {
+        try {
+            const {
+                date_start,
+                date_end
+            } = req.body;
+            if (!date_start || !date_end) return res.json(returnError(401, 'invalid input', {}, req.path));
+            const getBills = await bill.findAll({
+                attributes: ['bill_id', 'payment_method', 'total_price', 'created_at', 'status'],
+                where: {
+                    created_at: {
+                        [Op.between]: [date_start, date_end]
+                    },
+                   //payment_method: 0
+                }
+            })
+            return res.json(returnSuccess(200, 'ok', getBills, req.path));
+        } catch (err) {
+            console.log(err);
+            return res.json(returnError(500, err.message, {}, req.path));
         }
     },
 }
