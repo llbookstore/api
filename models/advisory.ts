@@ -1,6 +1,33 @@
-const Sequelize = require('sequelize');
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('advisory', {
+import Sequelize, { DataTypes, Model, Optional } from 'sequelize';
+
+export interface advisoryAttributes {
+  advisory_id: number;
+  username?: string;
+  address?: string;
+  phone?: string;
+  user_note?: string;
+  created_at?: number;
+  status?: number;
+  handle_history?: string;
+}
+
+export type advisoryPk = "advisory_id";
+export type advisoryId = advisory[advisoryPk];
+export type advisoryCreationAttributes = Optional<advisoryAttributes, advisoryPk>;
+
+export class advisory extends Model<advisoryAttributes, advisoryCreationAttributes> implements advisoryAttributes {
+  advisory_id!: number;
+  username?: string;
+  address?: string;
+  phone?: string;
+  user_note?: string;
+  created_at?: number;
+  status?: number;
+  handle_history?: string;
+
+
+  static initModel(sequelize: Sequelize.Sequelize): typeof advisory {
+    advisory.init({
     advisory_id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -37,12 +64,12 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.TINYINT,
       allowNull: true,
       defaultValue: 1,
-      comment: "0 - cancel\n1 - pending\n2 - processing \n3 - approved",
+      comment: "0 - cancel\n1 - pending\n2 - approved",
       validate: {
         isInt: {
           msg: 'status must be a number'
         },
-        checkStatus(status) {
+        checkStatus(status: number) {
           if (status < 0)
 
             throw new Error('status is invalid!');
@@ -52,7 +79,7 @@ module.exports = function(sequelize, DataTypes) {
     handle_history: {
       type: DataTypes.TEXT,
       allowNull: true,
-      comment: "array object\n{\n  id: ' ',\n  admin_name: ' ',\n  status: ' ',\n  admin_note: ' ',\n}..."
+      comment: "array object\\n{\\n  id: ' ',\\n  admin_name: ' ',\\n  status: ' ',\\n  admin_note: ' ',\\n}..."
     }
   }, {
     sequelize,
@@ -77,4 +104,6 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
-};
+  return advisory;
+  }
+}
