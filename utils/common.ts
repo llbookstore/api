@@ -3,7 +3,7 @@ interface ResopnseReturn {
     status: 0 | 1,
     code: number | string,
     msg: string,
-    data: any,
+    data: object | null,
     path: string
 
 }
@@ -36,7 +36,7 @@ export function getCurrentTimestamp(): number {
  * @param {string} msg
  * @return {any}
  */
-export function returnSuccess(code: string | number, msg: string, data = {}, path: string): ResopnseReturn {
+export function returnSuccess(code: string | number, msg: string, data: object | null, path: string): ResopnseReturn {
     return {
         status: 1,
         code,

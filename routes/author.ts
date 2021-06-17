@@ -1,8 +1,8 @@
-const express = require('express');
-const { commonAuth, adminAuth } = require('../middleware/authentication');
+import express from 'express';
+import { commonAuth, adminAuth } from '../middleware/authentication';
+import * as authorService from '../services/author-service';
+import { upload, errHandling } from '../middleware/upload';
 const router = express.Router();
-const authorService = require('../services/author-service');
-const { upload, errHandling } = require('../middleware/upload');
 router
     .get('/author', authorService.getAuthors)
     .get('/author/:id', authorService.getAuthorById)
@@ -10,4 +10,4 @@ router
     .put('/author/:id', adminAuth, upload.single('avatar'), errHandling, authorService.updateAuthor)
     .delete('/author/:id', adminAuth, authorService.deleteAuthor)
     .put('/author/:id/restore', adminAuth, authorService.restoreAuthor)
-module.exports = router
+export default router;
