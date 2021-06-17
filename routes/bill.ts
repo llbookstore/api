@@ -1,7 +1,7 @@
-const express = require('express');
-const { commonAuth, adminAuth } = require('../middleware/authentication');
+import express from 'express';
+import { commonAuth, adminAuth } from '../middleware/authentication';
+import * as billService from '../services/bill-service';
 const router = express.Router();
-const billService = require('../services/bill-service');
 
 router
     .get('/bill', billService.getBills)
@@ -13,4 +13,4 @@ router
     .post('/bill/revenue_cod_stat', adminAuth, billService.revenueCodStat)
     .delete('/bill/:id/cancel', commonAuth, billService.cancelBill)
 
-module.exports = router
+export default router;

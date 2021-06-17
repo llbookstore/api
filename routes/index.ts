@@ -3,6 +3,7 @@ import express from 'express'
 import account from './account';
 import advisory from './advisory';
 import author from './author';
+import bill from './bill';
 // const category = require('./category');
 // const sale = require('./sale');
 // const book = require('./book');
@@ -18,7 +19,7 @@ export default function (app: express.Application) {
     // app.use('/', sale);
     // app.use('/', book);
     // app.use('/', publishing_house);
-    // app.use('/', bill);
+    app.use('/', bill);
     // app.use('/', news);
     // app.use('/', review);
 }

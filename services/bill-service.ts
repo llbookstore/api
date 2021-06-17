@@ -1,15 +1,15 @@
+import { Request, Response, NextFunction } from 'express';
 //sequelize
-const { Op } = require('sequelize');
+import { Op } from  'sequelize';
 //db
-const sequelize = require('../config/connectDB');
-const db = require('../models/init-models');
-const normalConfig = require('../config/normal');
-const { bill, bill_detail, account, book } = db.initModels(sequelize);
+import sequelize from  '../config/connectDB';
+import * as db from  '../models/init-models';
+import normalConfig from  '../config/normal';
+import { LooseObject } from '../types/types';
+const { bill, bill_detail, account, book }: any = db.initModels(sequelize);
 
-const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
-module.exports = {
-
-    async getBills(req, res, next) {
+import { returnSuccess, returnError, getCurrentTimestamp, dateToTimestamp, isNumeric } from  '../utils/common';
+    export async function getBills(req: Request, res: Response, next: NextFunction) {
         try {
             let {
                 q = '',
@@ -21,12 +21,12 @@ module.exports = {
                 date_start,
                 date_end
             } = req.query;
-            const limit = parseInt(row_per_page) || normalConfig.row_per_page;
+            const limit: number = parseInt(row_per_page as string) || normalConfig.row_per_page;
             let offset = 0;
-            if (isNumeric(current_page)) {
-                offset = (parseInt(current_page) - 1) * limit;
+            if (current_page && isNumeric(current_page as string)) {
+                offset = (parseInt(current_page as string) - 1) * limit;
             }
-            const condition = {
+            const condition: LooseObject = {
                 [Op.or]: [
                     { user_name: { [Op.substring]: q } },
                     { bill_id: { [Op.substring]: q } },
@@ -39,7 +39,7 @@ module.exports = {
             if (date_start) condition.created_at = { [Op.gte]: date_start };
             if (date_end) condition.created_at = { [Op.lte]: date_end };
             if (date_start && date_end) {
-                condition.created_at = { [Op.between]: [dateToTimestamp(date_start), dateToTimestamp(date_end)] };
+                condition.created_at = { [Op.between]: [dateToTimestamp(date_start as string), dateToTimestamp(date_end as string)] };
             }
             const getBills = await bill.findAndCountAll({
                 where: condition,
@@ -65,12 +65,12 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));
         }
-    },
-    async getBillById(req, res, next) {
+    }
+    export async function getBillById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
             const { user_id } = req.query;
-            const condition = {
+            const condition: LooseObject = {
                 bill_id: id
             };
             if (user_id) condition.user_id = user_id;
@@ -95,9 +95,9 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));
         }
-    },
+    }
 
-    async addBill(req, res, next) {
+    export async function addBill(req: Request, res: Response, next: NextFunction) {
         try {
             const { user_name, phone, address, user_note, payment_method, total_price, user_id } = req.body;
             console.log(user_name, phone, address, user_note, payment_method, total_price, user_id)
@@ -121,9 +121,9 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));
         }
-    },
+    }
 
-    async addBillDetail(req, res, next) {
+    export async function addBillDetail(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
             if (!isNumeric(id)) return res.json(returnError(401, 'invalid params', {}, req.path));
@@ -142,9 +142,9 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));
         }
-    },
+    }
 
-    async handleBill(req, res, next) {
+    export async function handleBill(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
             const { status, note = '', is_paid } = req.body;
@@ -155,7 +155,7 @@ module.exports = {
             const { handle_history } = findBillById;
             const handleAt = getCurrentTimestamp();
             const { userId, username } = req.userData;
-            const adminHandle = {
+            const adminHandle: LooseObject = {
                 admin_id: userId,
                 admin_name: username,
                 note,
@@ -164,7 +164,7 @@ module.exports = {
                 handled_at: handleAt
             }
             const newHandleHistory = handle_history ? [...JSON.parse(handle_history), adminHandle] : [adminHandle];
-            const updateBillHistory = { status, handle_history: JSON.stringify(newHandleHistory) };
+            const updateBillHistory: LooseObject = { status, handle_history: JSON.stringify(newHandleHistory) };
             if (is_paid === 1) {
                 updateBillHistory.is_paid = is_paid;
                 updateBillHistory.paid_time = getCurrentTimestamp();
@@ -192,9 +192,8 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, req.path));
         }
-    },
-
-    async revenueStat(req, res, next) {
+    }
+    export async function revenueStat(req: Request, res: Response, next: NextFunction) {
         try {
             const {
                 date_start,
@@ -215,9 +214,9 @@ module.exports = {
             console.log(err);
             return res.json(returnError(500, err.message, {}, req.path));
         }
-    },
+    }
 
-    async revenueCodStat(req, res, next) {
+    export async function revenueCodStat(req: Request, res: Response, next: NextFunction) {
         try {
             const {
                 date_start,
@@ -238,8 +237,8 @@ module.exports = {
             console.log(err);
             return res.json(returnError(500, err.message, {}, req.path));
         }
-    },
-    async cancelBill(req, res, next) {
+    }
+    export async function cancelBill(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params;
             await bill.update({status: -1}, { where: { bill_id: id } });
@@ -249,4 +248,3 @@ module.exports = {
             return res.json(returnError(500, err.message, {}, req.path));
         }
     }
-}
