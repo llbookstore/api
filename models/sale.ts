@@ -43,69 +43,69 @@ export class sale extends Model<saleAttributes, saleCreationAttributes> implemen
 
   static initModel(sequelize: Sequelize.Sequelize): typeof sale {
     sale.init({
-    sale_id: {
-      autoIncrement: true,
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true
-    },
-    active: {
-      type: DataTypes.TINYINT,
-      allowNull: true,
-      defaultValue: 1,
-      comment: "0 - inactive\\\\\\\\\\\\\\\\n1 - active"
-    },
-    percent: {
-      type: DataTypes.DOUBLE,
-      allowNull: true
-    },
-    date_start: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    date_end: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    created_at: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    created_by: {
-      type: DataTypes.STRING(45),
-      allowNull: true
-    },
-    updated_at: {
-      type: DataTypes.INTEGER,
-      allowNull: true
-    },
-    updated_by: {
-      type: DataTypes.STRING(45),
-      allowNull: true
-    }
-  }, {
-    sequelize,
-    tableName: 'sale',
-    timestamps: false,
-    indexes: [
-      {
-        name: "PRIMARY",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "sale_id" },
-        ]
+      sale_id: {
+        autoIncrement: true,
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true
       },
-      {
-        name: "sale_id_UNIQUE",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "sale_id" },
-        ]
+      active: {
+        type: DataTypes.TINYINT,
+        allowNull: true,
+        defaultValue: 1,
+        comment: "0 - inactive\\\\\\\\\\\\\\\\n1 - active"
       },
-    ]
-  });
-  return sale;
+      percent: {
+        type: DataTypes.DOUBLE,
+        allowNull: true
+      },
+      date_start: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      date_end: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      created_at: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      created_by: {
+        type: DataTypes.STRING(45),
+        allowNull: true
+      },
+      updated_at: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      updated_by: {
+        type: DataTypes.STRING(45),
+        allowNull: true
+      }
+    }, {
+      sequelize,
+      tableName: 'sale',
+      timestamps: false,
+      indexes: [
+        {
+          name: "PRIMARY",
+          unique: true,
+          using: "BTREE",
+          fields: [
+            { name: "sale_id" },
+          ]
+        },
+        {
+          name: "sale_id_UNIQUE",
+          unique: true,
+          using: "BTREE",
+          fields: [
+            { name: "sale_id" },
+          ]
+        },
+      ]
+    });
+    return sale;
   }
 }

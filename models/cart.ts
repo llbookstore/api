@@ -30,52 +30,52 @@ export class cart extends Model<cartAttributes, cartCreationAttributes> implemen
 
   static initModel(sequelize: Sequelize.Sequelize): typeof cart {
     cart.init({
-    acc_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'account',
-        key: 'account_id'
-      }
-    },
-    book_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'book',
-        key: 'book_id'
-      }
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      defaultValue: 1
-    }
-  }, {
-    sequelize,
-    tableName: 'cart',
-    timestamps: false,
-    indexes: [
-      {
-        name: "PRIMARY",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "acc_id" },
-          { name: "book_id" },
-        ]
+      acc_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        references: {
+          model: 'account',
+          key: 'account_id'
+        }
       },
-      {
-        name: "fk_cart_book_idx",
-        using: "BTREE",
-        fields: [
-          { name: "book_id" },
-        ]
+      book_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        references: {
+          model: 'book',
+          key: 'book_id'
+        }
       },
-    ]
-  });
-  return cart;
+      quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 1
+      }
+    }, {
+      sequelize,
+      tableName: 'cart',
+      timestamps: false,
+      indexes: [
+        {
+          name: "PRIMARY",
+          unique: true,
+          using: "BTREE",
+          fields: [
+            { name: "acc_id" },
+            { name: "book_id" },
+          ]
+        },
+        {
+          name: "fk_cart_book_idx",
+          using: "BTREE",
+          fields: [
+            { name: "book_id" },
+          ]
+        },
+      ]
+    });
+    return cart;
   }
 }

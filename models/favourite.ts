@@ -28,47 +28,47 @@ export class favourite extends Model<favouriteAttributes, favouriteCreationAttri
 
   static initModel(sequelize: Sequelize.Sequelize): typeof favourite {
     favourite.init({
-    acc_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'account',
-        key: 'account_id'
-      }
-    },
-    book_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'book',
-        key: 'book_id'
-      }
-    }
-  }, {
-    sequelize,
-    tableName: 'favourite',
-    timestamps: false,
-    indexes: [
-      {
-        name: "PRIMARY",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "acc_id" },
-          { name: "book_id" },
-        ]
+      acc_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        references: {
+          model: 'account',
+          key: 'account_id'
+        }
       },
-      {
-        name: "favourite_fk_book_idx",
-        using: "BTREE",
-        fields: [
-          { name: "book_id" },
-        ]
-      },
-    ]
-  });
-  return favourite;
+      book_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        references: {
+          model: 'book',
+          key: 'book_id'
+        }
+      }
+    }, {
+      sequelize,
+      tableName: 'favourite',
+      timestamps: false,
+      indexes: [
+        {
+          name: "PRIMARY",
+          unique: true,
+          using: "BTREE",
+          fields: [
+            { name: "acc_id" },
+            { name: "book_id" },
+          ]
+        },
+        {
+          name: "favourite_fk_book_idx",
+          using: "BTREE",
+          fields: [
+            { name: "book_id" },
+          ]
+        },
+      ]
+    });
+    return favourite;
   }
 }

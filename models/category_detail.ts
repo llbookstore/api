@@ -28,47 +28,47 @@ export class category_detail extends Model<category_detailAttributes, category_d
 
   static initModel(sequelize: Sequelize.Sequelize): typeof category_detail {
     category_detail.init({
-    category_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'category',
-        key: 'category_id'
-      }
-    },
-    book_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      references: {
-        model: 'book',
-        key: 'book_id'
-      }
-    }
-  }, {
-    sequelize,
-    tableName: 'category_detail',
-    timestamps: false,
-    indexes: [
-      {
-        name: "PRIMARY",
-        unique: true,
-        using: "BTREE",
-        fields: [
-          { name: "category_id" },
-          { name: "book_id" },
-        ]
+      category_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        references: {
+          model: 'category',
+          key: 'category_id'
+        }
       },
-      {
-        name: "cat_fk_book_idx",
-        using: "BTREE",
-        fields: [
-          { name: "book_id" },
-        ]
-      },
-    ]
-  });
-  return category_detail;
+      book_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        references: {
+          model: 'book',
+          key: 'book_id'
+        }
+      }
+    }, {
+      sequelize,
+      tableName: 'category_detail',
+      timestamps: false,
+      indexes: [
+        {
+          name: "PRIMARY",
+          unique: true,
+          using: "BTREE",
+          fields: [
+            { name: "category_id" },
+            { name: "book_id" },
+          ]
+        },
+        {
+          name: "cat_fk_book_idx",
+          using: "BTREE",
+          fields: [
+            { name: "book_id" },
+          ]
+        },
+      ]
+    });
+    return category_detail;
   }
 }
