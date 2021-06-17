@@ -1,7 +1,7 @@
 
 import express from 'express'
 import account from './account';
-// const advisory = require('./advisory');
+import advisory from './advisory';
 // const author = require('./author');
 // const category = require('./category');
 // const sale = require('./sale');
@@ -12,7 +12,7 @@ import account from './account';
 // const review = require('./review');
 export default function (app: express.Application) {
     app.use('/', account);
-    // app.use('/', advisory);
+    app.use('/', advisory);
     // app.use('/', author);
     // app.use('/', category);
     // app.use('/', sale);
