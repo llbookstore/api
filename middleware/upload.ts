@@ -1,15 +1,16 @@
-const multer = require('multer');
-const path = require('path');
-const { returnError } = require('../utils/common');
+import multer from 'multer';
+import path from 'path';
+import { returnError }from '../utils/common';
+import { Request, Response, NextFunction, Express} from 'express'
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) {
         cb(null, './images')
     },
-    filename: (req, file, cb) => {
+    filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
         cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
     }
 });
-const fileFilter = (req, file, cb) => {
+const fileFilter: any = (req: Request, file: Express.Multer.File, cb: (error: Error | null, success: boolean) => void) => {
     if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
         cb(null, true);
     } else {
@@ -22,7 +23,7 @@ const upload = multer({
     limits: { fileSize: 1024 * 1024 * 10 }
 });
 
-const errHandling = (err, req, res, next) => {
+const errHandling = (err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof multer.MulterError) {
         return res.json(returnError(401,err.message,{}, req.path));
         // A Multer error occurred when uploading.
@@ -33,7 +34,7 @@ const errHandling = (err, req, res, next) => {
     // Everything went fine.
 }
 
-module.exports = {
+export  {
     upload,
     errHandling
 };
