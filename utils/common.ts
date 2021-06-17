@@ -17,10 +17,10 @@ export function isNumeric(str: string): boolean {
             !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
     }
 }
-export function dateToTimestamp(date: Date, format = 'MM-DD-YYYY'): number {
+export function dateToTimestamp(date: string, format = 'MM-DD-YYYY'): string {
     const day = moment(date, format, true);
     if (!day.isValid()) throw new Error(`invalid date [format: ${format}]`);
-    return day.unix();
+    return `${day.unix()}`;
 }
 export function timestampToDate(timestamp: number, format = 'MM-DD-YYYY, h:mm:ss a') {
     const day = moment.unix(timestamp);

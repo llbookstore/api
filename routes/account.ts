@@ -1,7 +1,7 @@
 import { Router } from 'express';
-const { commonAuth, adminAuth } = require('../middleware/authentication');
-import  accountService from '../services/account-service';
-const { upload, errHandling } = require('../middleware/upload');
+import { commonAuth, adminAuth } from '../middleware/authentication';
+import  * as accountService from '../services/account-service';
+import { upload, errHandling } from '../middleware/upload';
 
 const router = Router();
 router

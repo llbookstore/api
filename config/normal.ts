@@ -1,1 +1,3 @@
-export const row_per_page = 10;
+export default {
+    row_per_page: 10
+} 
