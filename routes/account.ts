@@ -1,8 +1,9 @@
-const express = require('express');
+import { Router } from 'express';
 const { commonAuth, adminAuth } = require('../middleware/authentication');
-const router = express.Router();
-const accountService = require('../services/account-service');
+import  accountService from '../services/account-service';
 const { upload, errHandling } = require('../middleware/upload');
+
+const router = Router();
 router
     .post('/account', accountService.addAccount)
     .get('/account', accountService.getAllAccount)
@@ -11,4 +12,4 @@ router
     .put('/account/:id/change-password', commonAuth, accountService.changePassword)
     .post('/login', accountService.login)
 
-module.exports = router
+export default router;

@@ -1,21 +1,30 @@
+
 //sequelize
-const { Op } = require('sequelize');
+import { Op } from 'sequelize';
+import sequelize from '../config/connectDB';
 //db
-const sequelize = require('../config/connectDB');
-const db = require('../models/init-models');
-const { account, favourite, cart } = db.initModels(sequelize);
+import * as db from '../models/init-models';
+const {  favourite, account, cart } : any= db.initModels(sequelize);
+
 //bcrypt
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
+import {Express, NextFunction, Request, Response } from 'express';
 const saltRounds = 10;
 //jwt
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+//
 const normalConfig = require('../config/normal');
 const { returnSuccess, returnError, getCurrentTimestamp, timestampToDate, dateToTimestamp, isNumeric } = require('../utils/common');
 const timeRegex = new RegExp('^[0-9]{2}-[0-9]{2}-[0-9]{4}$');
 const timeRegex2 = new RegExp('^[0-9]{2}/[0-9]{2}/[0-9]{4}$') //DD/MM/YYYY
-module.exports = {
-
-    async addAccount(req, res, next) {
+declare module "express-serve-static-core" {
+    interface Request {
+        userData: any,
+        file: Express.Multer.File
+    }
+}
+export default class AccountService {
+    static async addAccount(req: Request, res: Response, next: NextFunction){
         const path = req.path;
         try {
             let { username, fullname, password, email, birth_date, gender, type, phone } = req.body;
@@ -46,7 +55,7 @@ module.exports = {
                 return res.json(returnError('500', err.message, {}, path));
             }
             const created_at = getCurrentTimestamp();
-            const created_by = req.userData ? req.userData.username : null;
+            const created_by = req.userData ? req.userData.username : null; ///hherer
 
             const data = {
                 account_name: username,
@@ -77,18 +86,21 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, path));
         }
-    },
+    }
 
-    async getAllAccount(req, res, next) {
+    public static async getAllAccount(req: Request, res: Response, next: NextFunction) { //get value through query params
         const path = req.path;
+        interface LooseObject {
+            [key: string]: any //know type key input ~ any value
+        }
         try {
-            let { q = '', type = -1, active = -1, row_per_page, current_page, time_start, time_end } = req.query;
-            const limit = parseInt(row_per_page) || normalConfig.row_per_page;
+            let { q = '', type = -1, active = -1, row_per_page , current_page, time_start, time_end } = req.query ;
+            const limit = parseInt(row_per_page as string) || normalConfig.row_per_page;
             let offset = 0;
             if (isNumeric(current_page)) {
-                offset = (parseInt(current_page) - 1) * limit;
+                offset = (parseInt(current_page as string) - 1) * limit;
             }
-            const condition = {
+            const condition: LooseObject = {
                 [Op.or]: [
                     { account_name: { [Op.substring]: q } },
                     { full_name: { [Op.substring]: q } },
@@ -101,21 +113,21 @@ module.exports = {
             if (active >= 0 && active <= 1) condition.active = active;
             //find by time
             if (time_start) {
-                if (!timeRegex.test(time_start)) return res.json(returnError('400', 'date invalid', {}, path));
+                if (!timeRegex.test(time_start as string)) return res.json(returnError('400', 'date invalid', {}, path));
                 time_start = dateToTimestamp(time_start);
             }
             if (time_end) {
-                if (!timeRegex.test(time_end)) return res.json(returnError('400', 'date invalid', {}, path));
+                if (!timeRegex.test(time_end as string)) return res.json(returnError('400', 'date invalid', {}, path));
                 time_end = dateToTimestamp(time_end);
             }
             if (time_start && time_end) {
-                condition.created_at = { [Op.between]: [parseInt(time_start), parseInt(time_end)] }
+                condition.created_at = { [Op.between]: [parseInt(time_start as string), parseInt(time_end as string)] }
             }
             else if (time_start) {
-                condition.created_at = { [Op.gte]: parseInt(time_start) }
+                condition.created_at = { [Op.gte]: parseInt(time_start as string) }
             }
             else if (time_end) {
-                condition.created_at = { [Op.lte]: parseInt(time_end) }
+                condition.created_at = { [Op.lte]: parseInt(time_end as string) }
             }
             //end find by time
             const get_account = await account.findAndCountAll({
@@ -126,7 +138,7 @@ module.exports = {
                 distinct: true,
                 order: [['account_id', 'ASC']],
             });
-            get_account.rows.map(item => {
+            get_account.rows.map((item : any) => {
                 if (item.dataValues.created_at)
                     item.dataValues.created_at = timestampToDate(item.dataValues.created_at);
                 if (item.dataValues.updated_at)
@@ -140,15 +152,15 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, path));
         }
-    },
+    }
 
-    async getAccountById(req, res, next) {
+    public static async getAccountById(req: Request, res: Response, next: NextFunction) {
         const path = req.path;
         try {
             const { id } = req.params;
             if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findAccById = await account.findOne({
-                attributes: { exclude: ['password'] },
+                 attributes: { exclude: ['password'] },
                 include: [
                     {
                         model: favourite,
@@ -180,16 +192,16 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, path));
         }
-    },
+    }
 
-    async updateAccount(req, res, next) {
+    public static async updateAccount(req: Request, res: Response, next: NextFunction) {
         const { username } = req.userData;
         const path = req.path;
         try {
             const { id } = req.params;
             if (!isNumeric(id)) return res.json(returnError(400, 'invalid id', {}, req.path));
             const findAccById = await account.findByPk(id);
-            let { account_name, password, avatar } = findAccById;
+            let { account_name, password, avatar } = findAccById!; //have
             if (!findAccById) return res.json(returnError('400', `Can not find account with id: ${id}`, {}, path));
             let { phone, email, fullname, birth_date, gender, type, active, address, avatar: avatarBody } = req.body;
             //check update 
@@ -244,9 +256,9 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, path));
         }
-    },
+    }
 
-    async changePassword(req, res, next) {
+    public static async changePassword(req: Request, res: Response, next: NextFunction) {
         const path = req.path;
         try {
             const { id } = req.params;
@@ -279,12 +291,12 @@ module.exports = {
             console.log(err);
             return res.json(returnError('500', err.message, {}, path));
         }
-    },
+    }
 
-    async login(req, res, next) {
+    public static async login(req: Request, res: Response, next: NextFunction) {
         try {
-
             const path = req.path;
+            const JWT_SECRET = process.env.JWT_SECRET || 'hihihi';
             //check input
             const { username = '', password = '' } = req.body;
             if (!username || !password || username.length < 6 || password.length < 6)
@@ -308,7 +320,7 @@ module.exports = {
                         fullname: findAccByUsername.full_name,
                         type: findAccByUsername.type
                     },
-                    process.env.JWT_SECRET,
+                    JWT_SECRET,
                     { expiresIn: '7d' },
                     function (err, token) {
                         if (err) return res.json(returnError('500', err.message, {}, path));
@@ -317,7 +329,7 @@ module.exports = {
             }
         } catch (err) {
             console.log(err);
-            return res.json(returnError('500', err.message, {}, path));
+            return res.json(returnError('500', err.message, {}, req.path));
         }
     }
 }
